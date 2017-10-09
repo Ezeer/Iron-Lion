@@ -10,7 +10,9 @@ Parts of the future GameEngine :
 
 * GUI : Using DXUTgui from DX sdk
 * AUDIO : Using XACT3 from DX sdk
-* INPUT : Using XINPUT from DX sdk
+* INPUT : Using XInput and DirectInput Side by Side from DX sdk
+  (which allows applications to interact with the Xbox 360 Controller when it is connected to a Windows PC.
+)
 * RENDER3D : Using Directx api
 * PHYSICS :  Using ... Bullet or other .
 * NETWORK : Not defined yet ...

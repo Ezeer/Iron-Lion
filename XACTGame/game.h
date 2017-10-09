@@ -52,7 +52,8 @@ enum AI_STATE
 };
 
 enum GAME_MODE
-{
+{   
+	GAME_SPLASH =0,
     GAME_RUNNING = 1,
     GAME_MAIN_MENU,
     GAME_AUDIO_MENU,
