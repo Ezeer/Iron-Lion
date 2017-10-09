@@ -3314,7 +3314,8 @@ void DXUTRender3DEnvironment9()
             }
         }
     }
-    
+	//*************************************************************************
+    /// USER ACTION CAPTURE
     // If the app called DXUTWasKeyPressed() then do the work 
     // to store the current state of the keys in bLastKeys
     if( GetDXUTState().GetAppCalledWasKeyPressed() )
