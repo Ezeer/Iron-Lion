@@ -1168,6 +1168,8 @@ void HandleAmmoAI( float fElapsedTime )
 // intended to contain actual rendering calls, which should instead be placed in the 
 // OnFrameRender callback.  
 //--------------------------------------------------------------------------------------
+//*******************************************************************************
+/// GAME LOGIC IS ON FRAME MOVE CALLBACK
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
     for( DWORD iPort = 0; iPort < DXUT_MAX_CONTROLLERS; iPort++ )
