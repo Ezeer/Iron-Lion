@@ -139,7 +139,7 @@
 				AdditionalOptions=""
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="DXUT\Core;DXUT\Optional;"
+				AdditionalIncludeDirectories="Lua\LuaBridge;Lua\include;DXUT\Core;DXUT\Optional"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
@@ -165,10 +165,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="X3daudio.lib d3dx10.lib d3dx9.lib dxerr.lib dxguid.lib winmm.lib comctl32.lib "
+				AdditionalDependencies="X3daudio.lib d3dx10.lib d3dx9.lib dxerr.lib dxguid.lib winmm.lib comctl32.lib lua51.lib"
 				OutputFile="$(OutDir)\IronLion.exe"
 				Version="0.0"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="Lua\lib"
 				GenerateManifest="true"
 				UACExecutionLevel="0"
 				DelayLoadDLLs=""
@@ -730,6 +731,10 @@
 				RelativePath="XACTGame.rc"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Lua"
+			>
 		</Filter>
 		<File
 			RelativePath="audio.cpp"

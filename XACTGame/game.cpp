@@ -9,7 +9,17 @@
 #include "game.h"
 #include "audio.h"
 #include "resource.h"
-
+//LUA
+#include <LuaBridge.h>
+#include <iostream>
+extern "C" {
+# include "lua.h"
+# include "lauxlib.h"
+# include "lualib.h"
+}
+//global state
+using namespace luabridge;
+lua_State* LuaState;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -35,6 +45,12 @@
 // INPUT CONFIGURATION
 #define IDC_INPUT               18
 
+//GUI
+struct MenuPageLua{ const wchar_t*  Title;int x; int y;};
+MenuPageLua InputOpt;
+
+
+
 //--------------------------------------------------------------------------------------
 // Forward declarations 
 //--------------------------------------------------------------------------------------
@@ -56,12 +72,45 @@ void UpdateResolutionList( DXUTDeviceSettings* pDS );
 CFirstPersonCamera  g_Camera;
 RENDER_STATE        g_Render;
 GAME_STATE          g_GameState;
+//GUI
+//MENU PANEL PLACEMENT
+//IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
+//TO WORK INLINE WITH THE RUNNING ENGINE
+void MenuDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,int WminusX, int HminusY);
+
+
+void MenuDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,int WminusX, int HminusY)
+{
+	 g_Render.AudioMenuDlg.SetLocation(( pBackBufferSurfaceDesc->Width - WminusX ) / 2,
+                                       ( pBackBufferSurfaceDesc->Height - HminusY ) / 2 );
+  
+}
+						
 
 //--------------------------------------------------------------------------------------
 // Initialize the app 
 //--------------------------------------------------------------------------------------
 void InitApp()
 {
+	//start lua binding
+	
+    LuaState = luaL_newstate();
+    luaL_dofile(LuaState, "script.lua");
+    luaL_openlibs(LuaState);
+    lua_pcall(LuaState, 0, 0, 0);
+    LuaRef t = getGlobal(LuaState, "InputMenuOption");
+    LuaRef title = t["title"];
+    LuaRef w = t["x"];
+    LuaRef h = t["y"];
+
+	std::string txt = title.cast<std::string>();
+	std::wstring wide_string = std::wstring(txt.begin(),txt.end());
+    InputOpt.Title = wide_string.c_str();
+    InputOpt.x = w.cast<int>();
+    InputOpt.y = h.cast<int>();
+   
+   
+
     srand( 0 );
 
     g_Render.pEffect = NULL;
@@ -108,7 +157,7 @@ void InitApp()
     // Init Input panel
     g_Render.InputMenuDlg.Init( &g_Render.DialogResourceManager );
     g_Render.InputMenuDlg.SetCallback( OnGUIEvent ); iY = 60;
-    g_Render.InputMenuDlg.AddStatic( IDC_STATIC, L"Input style", ( 250 - 125 ) / 2, iY += 24, 125, 22 );
+    g_Render.InputMenuDlg.AddStatic( IDC_STATIC, InputOpt.Title, ( InputOpt.x - InputOpt.y ) / 2, iY += 24, 125, 22 );
     //g_Render.InputMenuDlg.AddSlider( IDC_MUSIC_SCALE, ( 250 - 100 ) / 2, iY += 24, 100, 22, 0, 100, 100 );
     //g_Render.InputMenuDlg.AddStatic( IDC_STATIC, L"Sound Effects Volume", ( 250 - 125 ) / 2, iY += 35, 125, 22 );
     //g_Render.InputMenuDlg.AddSlider( IDC_SOUNDFX_SCALE, ( 250 - 100 ) / 2, iY += 24, 100, 22, 0, 100, 100 );
@@ -640,9 +689,12 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
                                                D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
-    g_Render.AudioMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
-                                       ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
-    g_Render.AudioMenuDlg.SetSize( 250, 300 );
+    //MENU PANEL PLACEMENT
+	//IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
+	//TO WORK INLINE WITH THE RUNNING ENGINE
+	 g_Render.AudioMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
+     ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
+	MenuDlg_SetLocation(pBackBufferSurfaceDesc,800,100);
 
     g_Render.VideoMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
@@ -2006,6 +2058,8 @@ void ToggleMenu()
         case GAME_AUDIO_MENU:
             g_GameState.gameMode = GAME_MAIN_MENU; break;
         case GAME_VIDEO_MENU:
+            g_GameState.gameMode = GAME_MAIN_MENU; break;
+		case GAME_INPUT_MENU:
             g_GameState.gameMode = GAME_MAIN_MENU; break;
     }
 

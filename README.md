@@ -1,5 +1,5 @@
 # Iron-Lion
-Game engine demo made from a directX sample (XACTGame )
+Game engine demo made from a directX(9&10) sample (XACTGame is the name of the root from sdk's demo)
 
 The purpose is to learn the DirectX Sdk step by step , through a little game :
 ( Based over an Audio demo , featuring XACT technology )
@@ -13,11 +13,11 @@ Parts of the future GameEngine :
 * INPUT : Using XInput and DirectInput Side by Side from DX sdk
   (which allows applications to interact with the Xbox 360 Controller when it is connected to a Windows PC.
 )
-* RENDER3D : Using Directx api
-* PHYSICS :  Using ... Bullet or other .
-* NETWORK : Not defined yet ...
-* AI :  Using FSM techniques
-
+* RENDERING 3D  : Using Directx api
+* PHYSICS       : Using ... Bullet or other .
+* NETWORK       : Not defined yet ...
+* AI LOGICS     : Using FSM techniques and more...
+* SCRIPTING     : USING LUA ( https://github.com/vinniefalco/LuaBridge )
 
 FAQ
 ************************
