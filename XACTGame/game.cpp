@@ -81,7 +81,7 @@ void InitApp()
         // adding input configuration panel
 	g_Render.MainMenuDlg.AddButton( IDC_INPUT, L"Input", ( 250 - 125 ) / 2, iY += 30, 125, 22, 'I' );
     g_Render.MainMenuDlg.AddButton( IDC_QUIT, L"Quit", ( 250 - 125 ) / 2, iY += 60, 125, 22, 'Q' );
-
+    // Init Music panel
     g_Render.AudioMenuDlg.Init( &g_Render.DialogResourceManager );
     g_Render.AudioMenuDlg.SetCallback( OnGUIEvent ); iY = 60;
     g_Render.AudioMenuDlg.AddStatic( IDC_STATIC, L"Music Volume", ( 250 - 125 ) / 2, iY += 24, 125, 22 );
@@ -89,7 +89,7 @@ void InitApp()
     g_Render.AudioMenuDlg.AddStatic( IDC_STATIC, L"Sound Effects Volume", ( 250 - 125 ) / 2, iY += 35, 125, 22 );
     g_Render.AudioMenuDlg.AddSlider( IDC_SOUNDFX_SCALE, ( 250 - 100 ) / 2, iY += 24, 100, 22, 0, 100, 100 );
     g_Render.AudioMenuDlg.AddButton( IDC_BACK, L"Back", ( 250 - 125 ) / 2, iY += 40, 125, 22 );
-
+     // Init Video panel
     g_Render.VideoMenuDlg.Init( &g_Render.DialogResourceManager );
     g_Render.VideoMenuDlg.SetCallback( OnGUIEvent ); iY = 0;
     g_Render.VideoMenuDlg.AddCheckBox( IDC_FULLSCREEN, L"Full screen", ( 250 - 200 ) / 2, iY += 30, 200, 22, true );
@@ -105,7 +105,15 @@ void InitApp()
     g_Render.VideoMenuDlg.AddSlider( IDC_MAX_DROIDS, ( 250 - 150 ) / 2, iY += 22, 150, 22, 1, MAX_DROID, 10 );
     g_Render.VideoMenuDlg.AddButton( IDC_APPLY, L"Apply", ( 250 - 125 ) / 2, iY += 35, 125, 22 );
     g_Render.VideoMenuDlg.AddButton( IDC_BACK, L"Back", ( 250 - 125 ) / 2, iY += 30, 125, 22 );
-
+    // Init Input panel
+    g_Render.InputMenuDlg.Init( &g_Render.DialogResourceManager );
+    g_Render.InputMenuDlg.SetCallback( OnGUIEvent ); iY = 60;
+    g_Render.InputMenuDlg.AddStatic( IDC_STATIC, L"Input style", ( 250 - 125 ) / 2, iY += 24, 125, 22 );
+    //g_Render.InputMenuDlg.AddSlider( IDC_MUSIC_SCALE, ( 250 - 100 ) / 2, iY += 24, 100, 22, 0, 100, 100 );
+    //g_Render.InputMenuDlg.AddStatic( IDC_STATIC, L"Sound Effects Volume", ( 250 - 125 ) / 2, iY += 35, 125, 22 );
+    //g_Render.InputMenuDlg.AddSlider( IDC_SOUNDFX_SCALE, ( 250 - 100 ) / 2, iY += 24, 100, 22, 0, 100, 100 );
+    g_Render.InputMenuDlg.AddButton( IDC_BACK, L"Back", ( 250 - 125 ) / 2, iY += 40, 125, 22 );
+   
     // Setup the camera
     D3DXVECTOR3 MinBound( g_MinBound.x + CAMERA_SIZE, g_MinBound.y + CAMERA_SIZE, g_MinBound.z + CAMERA_SIZE );
     D3DXVECTOR3 MaxBound( g_MaxBound.x - CAMERA_SIZE, g_MaxBound.y - CAMERA_SIZE, g_MaxBound.z - CAMERA_SIZE );
@@ -1628,7 +1636,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
                     RenderDroid( pd3dDevice, A, mView, mProj, g_GameState.DroidQ[A].nHitPoints <= 0 );
             }
         }
-
+        // GUI STUFF
         switch( g_GameState.gameMode )
         {
             case GAME_RUNNING:
@@ -1639,6 +1647,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
                 V( g_Render.AudioMenuDlg.OnRender( fElapsedTime ) ); break;
             case GAME_VIDEO_MENU:
                 V( g_Render.VideoMenuDlg.OnRender( fElapsedTime ) ); break;
+			case GAME_INPUT_MENU:
+                V( g_Render.InputMenuDlg.OnRender( fElapsedTime ) ); break;
         }
 
         V( pd3dDevice->EndScene() );
@@ -1684,6 +1694,8 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bo
             g_Render.AudioMenuDlg.MsgProc( hWnd, uMsg, wParam, lParam ); break;
         case GAME_VIDEO_MENU:
             g_Render.VideoMenuDlg.MsgProc( hWnd, uMsg, wParam, lParam ); break;
+	    case GAME_INPUT_MENU:
+            g_Render.InputMenuDlg.MsgProc( hWnd, uMsg, wParam, lParam ); break;
     }
 
     return 0;
@@ -1910,6 +1922,10 @@ void CALLBACK OnGUIEvent( UINT nEvent, int nControlID, CDXUTControl* pControl, v
             g_audioState.fMusicVolume = ( float )( g_Render.AudioMenuDlg.GetSlider( IDC_MUSIC_SCALE )->GetValue() /
                                                    100.0f );
             SetMusicVolume( g_audioState.fMusicVolume );
+            break;
+	    case IDC_INPUT:
+			g_GameState.gameMode = GAME_INPUT_MENU;
+            
             break;
         case IDC_SOUNDFX_SCALE:
             g_audioState.fSoundFXVolume = ( float )( g_Render.AudioMenuDlg.GetSlider( IDC_SOUNDFX_SCALE )->GetValue() /
