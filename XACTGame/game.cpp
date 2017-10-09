@@ -613,7 +613,7 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
         g_Camera.SetRotateButtons( 0, 0, false, true );
         g_Camera.SetResetCursorAfterMove( true );
     }
-
+    /// GUI setup
     g_Render.MainMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
