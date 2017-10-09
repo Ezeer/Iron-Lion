@@ -723,7 +723,8 @@ float GetDistFromWall( D3DXVECTOR3 P1, D3DXVECTOR3 P2, D3DXVECTOR3 P3, D3DXVECTO
     }
 }
 
-
+///*****************************************************
+/// PART OF AI
 //--------------------------------------------------------------------------------------
 void DroidPickNewDirection( int A )
 {
