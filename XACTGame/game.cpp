@@ -1034,6 +1034,8 @@ void CheckForInterAmmoCollision( float fElapsedTime )
 
 
 //--------------------------------------------------------------------------------------
+//***************************************
+// AUDIO EVENT LAUNCH
 void CheckForAmmoToWallCollision( int A )
 {
     // Check bounce on ground
