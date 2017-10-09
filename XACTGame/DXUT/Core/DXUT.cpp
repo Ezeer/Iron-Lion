@@ -3247,7 +3247,8 @@ void DXUTRender3DEnvironment9()
     DXUTUpdateFrameStats();
 
     DXUTHandleTimers();
-
+    //************************************************************
+	// FRAME FLIPPING IS HERE
     // Animate the scene by calling the app's frame move callback
     LPDXUTCALLBACKFRAMEMOVE pCallbackFrameMove = GetDXUTState().GetFrameMoveFunc();
     if( pCallbackFrameMove != NULL )
@@ -3312,7 +3313,7 @@ void DXUTRender3DEnvironment9()
             }
         }
     }
-
+    
     // If the app called DXUTWasKeyPressed() then do the work 
     // to store the current state of the keys in bLastKeys
     if( GetDXUTState().GetAppCalledWasKeyPressed() )
