@@ -49,7 +49,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
     }
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device 
-    DXUTCreateWindow( L"XACTGame" );
+    DXUTCreateWindow( L"Iron-Lion" );
     DXUTCreateDevice( false, 0, 0 );
 
     // Start the frame loop
