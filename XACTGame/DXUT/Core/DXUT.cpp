@@ -3258,7 +3258,8 @@ void DXUTRender3DEnvironment9()
         if( NULL == pd3dDevice ) // Handle DXUTShutdown from inside callback
             return;
     }
-
+	//****************************************************************************
+    /// RENDER OCCURS HERE
     if( !GetDXUTState().GetRenderingPaused() )
     {
         // Render the scene by calling the app's render callback
