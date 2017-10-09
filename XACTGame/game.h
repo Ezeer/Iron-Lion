@@ -53,7 +53,7 @@ enum AI_STATE
 
 enum GAME_MODE
 {   
-	GAME_SPLASH =0,
+	GAME_SPLASH  = 0,
     GAME_RUNNING = 1,
     GAME_MAIN_MENU,
     GAME_AUDIO_MENU,
@@ -76,6 +76,7 @@ struct RENDER_STATE
     CDXUTDialog MainMenuDlg;  // dialog for main menu
     CDXUTDialog VideoMenuDlg;  // dialog for video menu
     CDXUTDialog AudioMenuDlg;  // dialog for audio menu
+	CDXUTDialog InputMenuDlg;  // dialog for audio menu
 
     ID3DXEffect* pEffect;      // D3DX effect interface
     IDirect3DTexture9* pDefaultTex;  // Default texture for un-textured geometry.

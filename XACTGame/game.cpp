@@ -30,6 +30,10 @@
 #define IDC_APPLY               14
 #define IDC_FULLSCREEN          15
 #define IDC_ASPECT              16
+// SPLASHSCREEN
+#define IDC_SPLASH              17
+// INPUT CONFIGURATION
+#define IDC_INPUT               18
 
 //--------------------------------------------------------------------------------------
 // Forward declarations 
@@ -74,6 +78,8 @@ void InitApp()
     g_Render.MainMenuDlg.AddButton( IDC_AUDIO, L"Audio", ( 250 - 125 ) / 2, iY += 30, 125, 22 );
     g_Render.MainMenuDlg.AddButton( IDC_VIDEO, L"Video", ( 250 - 125 ) / 2, iY += 30, 125, 22 );
     g_Render.MainMenuDlg.AddButton( IDC_RESUME, L"Resume", ( 250 - 125 ) / 2, iY += 30, 125, 22 );
+        // adding input configuration panel
+	g_Render.MainMenuDlg.AddButton( IDC_INPUT, L"Input", ( 250 - 125 ) / 2, iY += 30, 125, 22, 'I' );
     g_Render.MainMenuDlg.AddButton( IDC_QUIT, L"Quit", ( 250 - 125 ) / 2, iY += 60, 125, 22, 'Q' );
 
     g_Render.AudioMenuDlg.Init( &g_Render.DialogResourceManager );
