@@ -3226,7 +3226,8 @@ void DXUTRender3DEnvironment9()
 
         GetDXUTState().SetDeviceLost( false );
     }
-
+	//*******************************************************************
+    /// TIMER IS HERE !!
     // Get the app's time, in seconds. Skip rendering if no time elapsed
     double fTime, fAbsTime; float fElapsedTime;
     DXUTGetGlobalTimer()->GetTimeValues( &fTime, &fAbsTime, &fElapsedTime );
