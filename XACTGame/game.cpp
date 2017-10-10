@@ -87,10 +87,7 @@ void Lua_RenderText()
     txtHelper.SetForegroundColor( D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) );
     txtHelper.DrawTextLine( DXUTGetFrameStats( true ) );
     txtHelper.DrawTextLine( DXUTGetDeviceStats() );
-    /*
-	txtHelper.DrawTextLine( L"X: Add Droid  Y: Toggle Droid Movement  B: Mass Kill" );
-    txtHelper.DrawFormattedTextLine( L"Pos: %0.2f, %0.2f, %0.2f", g_Camera.GetEyePt()->x, g_Camera.GetEyePt()->y,
-                                     g_Camera.GetEyePt()->z );*/
+  
 	//LUA REDESIGN
 	
 	getGlobalNamespace(Lua).addFunction("printMessage", printLuaMessage);
@@ -105,19 +102,25 @@ void Lua_RenderText()
 }
 
 //GUI
-//MENU PANEL PLACEMENT
-//IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
-//TO WORK INLINE WITH THE RUNNING ENGINE
-void MenuInputDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc);
+//LUA STUFF NOW ...
+//c++ side
+void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog);
+void Lua_OPT_DLG_SetSize(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog);
 
-
-void MenuInputDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc)
+void Lua_OPT_DLG_SetSize(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog)
 {
-	g_Render.InputMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - InputOpt.x ) / 2,
-     ( pBackBufferSurfaceDesc->Height - InputOpt.y ) / 2 );
-	
-  
+   dialog->SetSize( InputOpt.x, InputOpt.y );
 }
+void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog)
+{
+	dialog->SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
+                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
+                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
+                                               D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
+    dialog->SetLocation( ( pBackBufferSurfaceDesc->Width - 250) / 2,
+     ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
+}
+
 						
 
 //--------------------------------------------------------------------------------------
@@ -719,10 +722,7 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
                                       ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
     g_Render.MainMenuDlg.SetSize( 250, 300 );
 
-    g_Render.AudioMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
-                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                               D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
+    
     //MENU PANEL PLACEMENT
 	//IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
 	//TO WORK INLINE WITH THE RUNNING ENGINE
@@ -732,7 +732,8 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
                                                D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
 	g_Render.AudioMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
      ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
-	//MenuDlg_SetLocation(pBackBufferSurfaceDesc,800,100);
+	g_Render.AudioMenuDlg.SetSize( 250, 300 );
+	
 
     g_Render.VideoMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
@@ -741,7 +742,11 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
     g_Render.VideoMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
                                        ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
     g_Render.VideoMenuDlg.SetSize( 250, 300 );
-    MenuInputDlg_SetLocation(pBackBufferSurfaceDesc);
+	//NEW LUA STUFF
+	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc, &g_Render.VideoMenuDlg);
+    Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc, &g_Render.InputMenuDlg);
+	Lua_OPT_DLG_SetSize(pBackBufferSurfaceDesc, &g_Render.InputMenuDlg);
+
     //PlayBGMusic();
 
     DXUTSetCursorSettings( ( g_GameState.gameMode != GAME_RUNNING ), true );
@@ -1730,6 +1735,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         switch( g_GameState.gameMode )
         {
             case GAME_RUNNING:
+				RenderText();
             Lua_RenderText(); break;//RenderText()
             case GAME_MAIN_MENU:
                 V( g_Render.MainMenuDlg.OnRender( fElapsedTime ) ); break;
