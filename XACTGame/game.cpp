@@ -150,36 +150,30 @@ void InitApp()
     LuaRef title = t["title"];
     LuaRef w = t["x"];
     LuaRef h = t["y"];
+	//fill the C++ struct now
+	InputOpt.x = w.cast<int>();
+    InputOpt.y = h.cast<int>();
 	//topleft
 	LuaRef TopLeftClr = t["TopLeftClr"];
 	LuaRef r = TopLeftClr["r"];
     LuaRef g = TopLeftClr["g"];
 	LuaRef b = TopLeftClr["b"];
     LuaRef a = TopLeftClr["a"];
-	//fill the C++ struct now
-	InputOpt.x = w.cast<int>();
-    InputOpt.y = h.cast<int>();
-    InputOpt.Topleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+	InputOpt.Topleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
    //topright
 	LuaRef TopRightClr = t["TopRightClr"];
-	 r = TopLeftClr["r"];
-     g = TopLeftClr["g"];
-	 b = TopLeftClr["b"];
-     a = TopLeftClr["a"];
-	//fill the C++ struct now
-	InputOpt.x = w.cast<int>();
-    InputOpt.y = h.cast<int>();
-    InputOpt.Topright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+	 r = TopRightClr["r"];
+     g = TopRightClr["g"];
+	 b = TopRightClr["b"];
+     a = TopRightClr["a"];
+	 InputOpt.Topright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
     //BottomLeftClr
 	LuaRef BottomLeftClr = t["BottomLeftClr"];
 	 r = BottomLeftClr["r"];
      g = BottomLeftClr["g"];
 	 b = BottomLeftClr["b"];
      a = BottomLeftClr["a"];
-	//fill the C++ struct now
-	InputOpt.x = w.cast<int>();
-    InputOpt.y = h.cast<int>();
-    InputOpt.Bottomleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+	 InputOpt.Bottomleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
     //BottomRightClr
 	LuaRef BottomRightClr = t["BottomLeftClr"];
 	 r = BottomRightClr["r"];
