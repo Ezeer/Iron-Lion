@@ -6,7 +6,7 @@
 #include "DXUT.h"
 #include "SDKmisc.h"
 #include <stdio.h>
-#include "game.h"
+//#include "game.h"
 #include "audio.h"
 #include "resource.h"
 #include "script.h"
@@ -65,107 +65,8 @@ GAME_STATE          g_GameState;
 //c++ side
 
 
-void Lua_OPT_DLG_SetBgColor(CDXUTDialog *dialog,MenuPageLua* page)
-{
-	dialog->SetBackgroundColors(page->Topleft,page->Topright,page->Bottomleft,page->Bottomright );
-}
-		 
 
-void Lua_OPT_DLG_SetSize(CDXUTDialog *dialog,MenuPageLua* page)
-{
-   dialog->SetSize( page->width, page->height );
-}
-void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog,MenuPageLua* page)
-{
-	
-    dialog->SetLocation( ( pBackBufferSurfaceDesc->Width - page->x) / 2,
-     ( pBackBufferSurfaceDesc->Height - page->y ) / 2 );
-}
 
-						
-#define MENU_MAIN 0
-#define MENU_VIDEO 1
-#define MENU_AUDIO 2
-#define MENU_INPUT 3
-
-void Lua_loadGuiMenu(int type)
-{
-	char* Name=NULL;
-	MenuPageLua page;
-	switch(type)
-	{
-	case MENU_VIDEO :
-		Name="VideoMenuOption";break;
-	case MENU_AUDIO :
-		Name="AudioMenuOption";break;
-	case MENU_INPUT :
-		Name="InputMenuOption";break;
-	case MENU_MAIN:
-		Name="MainMenuOption";break;
-	}
-	
-	LuaRef t = getGlobal(Lua,Name);
-	//TITLE
-    LuaRef title = t["title"];
-	std::string txt = title.cast<std::string>();
-	std::wstring wide_string = std::wstring(txt.begin(),txt.end());
-    page.Title = wide_string.c_str();
-    //POSITION
-    LuaRef w = t["x"];
-    LuaRef h = t["y"];
-	//fill the C++ struct now
-	page.x = w.cast<int>();
-    page.y = h.cast<int>();
-	//SIZE
-    LuaRef width = t["width"];
-    LuaRef height = t["height"];
-	//fill the C++ struct now
-	page.width =width.cast<int>();
-    page.height = height.cast<int>();
-	//4 CORNERS COLORS
-	//topleft
-	LuaRef TopLeftClr = t["TopLeftClr"];
-	LuaRef r = TopLeftClr["r"];
-    LuaRef g = TopLeftClr["g"];
-	LuaRef b = TopLeftClr["b"];
-    LuaRef a = TopLeftClr["a"];
-	page.Topleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
-   //topright
-	LuaRef TopRightClr = t["TopRightClr"];
-	 r = TopRightClr["r"];
-     g = TopRightClr["g"];
-	 b = TopRightClr["b"];
-     a = TopRightClr["a"];
-	 page.Topright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
-    //BottomLeftClr
-	LuaRef BottomLeftClr = t["BottomLeftClr"];
-	 r = BottomLeftClr["r"];
-     g = BottomLeftClr["g"];
-	 b = BottomLeftClr["b"];
-     a = BottomLeftClr["a"];
-	 page.Bottomleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
-    //BottomRightClr
-	LuaRef BottomRightClr = t["BottomRightClr"];
-	 r = BottomRightClr["r"];
-     g = BottomRightClr["g"];
-	 b = BottomRightClr["b"];
-     a = BottomRightClr["a"];
-	 page.Bottomright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
-   switch(type)
-	{
-	case MENU_VIDEO :
-		VideoOpt=page;break;
-	case MENU_AUDIO :
-		AudioOpt=page;break;
-	case MENU_INPUT :
-		InputOpt=page;break;
-	case MENU_MAIN:
-		MenuOpt=page;break;
-	}
-   
-    
-
-}
 //--------------------------------------------------------------------------------------
 // Initialize the app 
 //--------------------------------------------------------------------------------------
