@@ -1,0 +1,2 @@
+
+void DroidPickNewDirection( int A );
