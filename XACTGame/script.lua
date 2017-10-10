@@ -5,27 +5,27 @@ MainMenuOption = {
 	width = 250,
 	height = 300,
 	TopLeftClr={
-	  r=192,
-	  g = 192,
-	  b = 192,
+	  r=92,
+	  g = 92,
+	  b = 92,
 	  a = 206
 	},
 	TopRightClr={
-	  r = 192,
-	  g = 192,
-	  b = 192,
+	  r = 92,
+	  g = 92,
+	  b = 92,
 	  a = 192
 	},
 	BottomLeftClr={
-	  r = 192,
-	  g = 192,
-	  b = 192,
+	  r = 92,
+	  g = 92,
+	  b = 92,
 	  a = 192
 	},
 	BottomRightClr={
-	  r = 192,
-	  g = 192,
-	  b = 192,
+	  r = 92,
+	  g = 92,
+	  b = 92,
 	  a = 179
 	}
 

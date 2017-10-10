@@ -744,6 +744,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="AI"
+			>
+			<File
+				RelativePath=".\Ai.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Ai.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="audio.cpp"
 			>
