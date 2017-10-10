@@ -94,7 +94,8 @@ void Lua_RenderText()
 	//LUA REDESIGN
 	
 	getGlobalNamespace(Lua).addFunction("printMessage", printLuaMessage);
-    luaL_dofile(Lua, "script.lua");
+    //we don't load the script because it should be in memory
+	//luaL_dofile(Lua, "script.lua");
     lua_pcall(Lua, 0, 0, 0);
     LuaRef sumNumbers = getGlobal(Lua, "sumNumbers");
     int result = sumNumbers(5, 4);
@@ -107,13 +108,14 @@ void Lua_RenderText()
 //MENU PANEL PLACEMENT
 //IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
 //TO WORK INLINE WITH THE RUNNING ENGINE
-void MenuDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,int WminusX, int HminusY);
+void MenuInputDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc);
 
 
-void MenuDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,int WminusX, int HminusY)
+void MenuInputDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc)
 {
-	 g_Render.InputMenuDlg.SetLocation(( pBackBufferSurfaceDesc->Width - WminusX ) / 2,
-                                       ( pBackBufferSurfaceDesc->Height - HminusY ) / 2 );
+	g_Render.InputMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - InputOpt.x ) / 2,
+     ( pBackBufferSurfaceDesc->Height - InputOpt.y ) / 2 );
+	
   
 }
 						
@@ -739,7 +741,7 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
     g_Render.VideoMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
                                        ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
     g_Render.VideoMenuDlg.SetSize( 250, 300 );
-
+    MenuInputDlg_SetLocation(pBackBufferSurfaceDesc);
     //PlayBGMusic();
 
     DXUTSetCursorSettings( ( g_GameState.gameMode != GAME_RUNNING ), true );
