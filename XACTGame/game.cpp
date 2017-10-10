@@ -70,8 +70,14 @@ CFirstPersonCamera  g_Camera;
 RENDER_STATE        g_Render;
 GAME_STATE          g_GameState;
 //LUA EXPERIMENT
+struct MenuPageLua{ const wchar_t*  Title;
+                   int x; 
+				   int y;
+				   D3DCOLOR Topleft;
+				   D3DCOLOR Topright;
+				   D3DCOLOR Bottomleft;
+				   D3DCOLOR Bottomright;};
 
-struct MenuPageLua{ const wchar_t*  Title;int x; int y;};
 MenuPageLua InputOpt;
 
 void printLuaMessage() 
@@ -106,6 +112,13 @@ void Lua_RenderText()
 //c++ side
 void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog);
 void Lua_OPT_DLG_SetSize(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog);
+void Lua_OPT_DLG_SetBgColor(CDXUTDialog *dialog);
+
+void Lua_OPT_DLG_SetBgColor(CDXUTDialog *dialog)
+{
+	dialog->SetBackgroundColors(InputOpt.Topleft,InputOpt.Topright,InputOpt.Bottomleft,InputOpt.Bottomright );
+}
+		 
 
 void Lua_OPT_DLG_SetSize(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog)
 {
@@ -113,10 +126,7 @@ void Lua_OPT_DLG_SetSize(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDial
 }
 void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog)
 {
-	dialog->SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
-                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                               D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
+	
     dialog->SetLocation( ( pBackBufferSurfaceDesc->Width - 250) / 2,
      ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
 }
@@ -134,16 +144,63 @@ void InitApp()
     luaL_dofile(Lua, "script.lua");
     luaL_openlibs(Lua);
     lua_pcall(Lua, 0, 0, 0);
+	//LUA OPTIONS
+	//Read Lua struct
     LuaRef t = getGlobal(Lua, "InputMenuOption");
     LuaRef title = t["title"];
     LuaRef w = t["x"];
     LuaRef h = t["y"];
+	//topleft
+	LuaRef TopLeftClr = t["TopLeftClr"];
+	LuaRef r = TopLeftClr["r"];
+    LuaRef g = TopLeftClr["g"];
+	LuaRef b = TopLeftClr["b"];
+    LuaRef a = TopLeftClr["a"];
+	//fill the C++ struct now
+	InputOpt.x = w.cast<int>();
+    InputOpt.y = h.cast<int>();
+    InputOpt.Topleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+   //topright
+	LuaRef TopRightClr = t["TopRightClr"];
+	 r = TopLeftClr["r"];
+     g = TopLeftClr["g"];
+	 b = TopLeftClr["b"];
+     a = TopLeftClr["a"];
+	//fill the C++ struct now
+	InputOpt.x = w.cast<int>();
+    InputOpt.y = h.cast<int>();
+    InputOpt.Topright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+    //BottomLeftClr
+	LuaRef BottomLeftClr = t["BottomLeftClr"];
+	 r = BottomLeftClr["r"];
+     g = BottomLeftClr["g"];
+	 b = BottomLeftClr["b"];
+     a = BottomLeftClr["a"];
+	//fill the C++ struct now
+	InputOpt.x = w.cast<int>();
+    InputOpt.y = h.cast<int>();
+    InputOpt.Bottomleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+    //BottomRightClr
+	LuaRef BottomRightClr = t["BottomLeftClr"];
+	 r = BottomRightClr["r"];
+     g = BottomRightClr["g"];
+	 b = BottomRightClr["b"];
+     a = BottomRightClr["a"];
+	//fill the C++ struct now
+	InputOpt.x = w.cast<int>();
+    InputOpt.y = h.cast<int>();
+    InputOpt.Bottomright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+   
+
 
 	std::string txt = title.cast<std::string>();
 	std::wstring wide_string = std::wstring(txt.begin(),txt.end());
     InputOpt.Title = wide_string.c_str();
-    InputOpt.x = w.cast<int>();
-    InputOpt.y = h.cast<int>();
+   
+	
+	
+
+	
    
    
 
@@ -194,7 +251,7 @@ void InitApp()
     // Init Input panel
     g_Render.InputMenuDlg.Init( &g_Render.DialogResourceManager );
     g_Render.InputMenuDlg.SetCallback( OnGUIEvent ); iY = 60;
-    g_Render.InputMenuDlg.AddStatic( IDC_STATIC, InputOpt.Title, ( InputOpt.x - InputOpt.y ) / 2, iY += 24, 125, 22 );
+    g_Render.InputMenuDlg.AddStatic( IDC_STATIC, InputOpt.Title, ( 250 - 125 )/ 2, iY += 24, 125, 22 );
     //g_Render.InputMenuDlg.AddSlider( IDC_MUSIC_SCALE, ( 250 - 100 ) / 2, iY += 24, 100, 22, 0, 100, 100 );
     //g_Render.InputMenuDlg.AddStatic( IDC_STATIC, L"Sound Effects Volume", ( 250 - 125 ) / 2, iY += 35, 125, 22 );
     //g_Render.InputMenuDlg.AddSlider( IDC_SOUNDFX_SCALE, ( 250 - 100 ) / 2, iY += 24, 100, 22, 0, 100, 100 );
@@ -714,10 +771,8 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
         g_Camera.SetResetCursorAfterMove( true );
     }
     /// GUI setup
-    g_Render.MainMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
-                                              D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                              D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                              D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
+	Lua_OPT_DLG_SetBgColor(&g_Render.MainMenuDlg);
+    
     g_Render.MainMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
                                       ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
     g_Render.MainMenuDlg.SetSize( 250, 300 );
@@ -1735,8 +1790,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         switch( g_GameState.gameMode )
         {
             case GAME_RUNNING:
-				RenderText();
-            Lua_RenderText(); break;//RenderText()
+				//RenderText();
+            Lua_RenderText(); break;
             case GAME_MAIN_MENU:
                 V( g_Render.MainMenuDlg.OnRender( fElapsedTime ) ); break;
             case GAME_AUDIO_MENU:
