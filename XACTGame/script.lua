@@ -2,10 +2,10 @@ MainMenuOption = {
     title = "Options",
     x = 250,
     y = 300,
-	width = 200,
+	width = 250,
 	height = 300,
 	TopLeftClr={
-	  r=0,
+	  r=250,
 	  g = 98,
 	  b = 138,
 	  a = 206
@@ -30,7 +30,6 @@ MainMenuOption = {
 	}
 
 }
-
 
 InputMenuOption = {
     title = "Input Options",
@@ -66,13 +65,13 @@ InputMenuOption = {
 }
 
 AudioMenuOption = {
-    title = "Input Options",
+    title = "AUDIO Options",
     x = 250,
     y = 300,
 	width = 200,
 	height = 300,
 	TopLeftClr={
-	  r=0,
+	  r=200,
 	  g = 98,
 	  b = 138,
 	  a = 206
@@ -104,7 +103,7 @@ VideoMenuOption = {
 	width = 200,
 	height = 300,
 	TopLeftClr={
-	  r=0,
+	  r=200,
 	  g = 98,
 	  b = 138,
 	  a = 206
@@ -130,7 +129,7 @@ VideoMenuOption = {
 
 }
 
-sumNumbers = function(a,b)
+output = function(a,b)
     printMessage("You can still call C++ functions from Lua functions!")
     return a + b
 end

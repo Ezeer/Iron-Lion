@@ -9,17 +9,7 @@
 #include "game.h"
 #include "audio.h"
 #include "resource.h"
-//LUA
-#include <LuaBridge.h>
-
-extern "C" {
-# include "lua.h"
-# include "lauxlib.h"
-# include "lualib.h"
-}
-//global state
-using namespace luabridge;
-lua_State* Lua;
+#include "script.h"
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -67,59 +57,13 @@ void UpdateResolutionList( DXUTDeviceSettings* pDS );
 // Global variables
 //--------------------------------------------------------------------------------------
 CFirstPersonCamera  g_Camera;
-RENDER_STATE        g_Render;
+extern RENDER_STATE g_Render;
 GAME_STATE          g_GameState;
-//LUA EXPERIMENT
-struct MenuPageLua{ const wchar_t*  Title;
-                   int x; 
-				   int y;
-				   int width;
-				   int height;
-				   D3DCOLOR Topleft;
-				   D3DCOLOR Topright;
-				   D3DCOLOR Bottomleft;
-				   D3DCOLOR Bottomright;};
-
-MenuPageLua MenuOpt;
-MenuPageLua InputOpt;
-MenuPageLua VideoOpt;
-MenuPageLua AudioOpt;
-
-
-
-void printLuaMessage() 
-{
-   // std::cout << s << std::endl;
-}
-void Lua_RenderText()
-{
-
-    CDXUTTextHelper txtHelper( g_Render.pFont, g_Render.pTextSprite, 15 );
-    txtHelper.Begin();
-    txtHelper.SetInsertionPos( 2, 0 );
-    txtHelper.SetForegroundColor( D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) );
-    txtHelper.DrawTextLine( DXUTGetFrameStats( true ) );
-    txtHelper.DrawTextLine( DXUTGetDeviceStats() );
-  
-	//LUA REDESIGN
-	
-	getGlobalNamespace(Lua).addFunction("printMessage", printLuaMessage);
-    //we don't load the script because it should be in memory
-	//luaL_dofile(Lua, "script.lua");
-    lua_pcall(Lua, 0, 0, 0);
-    LuaRef sumNumbers = getGlobal(Lua, "sumNumbers");
-    int result = sumNumbers(5, 4);
-	txtHelper.DrawTextLine( L" Lua console" );
-    txtHelper.DrawFormattedTextLine( L"Lua say : %d",result  );
-    txtHelper.End();
-}
 
 //GUI
 //LUA STUFF NOW ...
 //c++ side
-void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog);
-void Lua_OPT_DLG_SetSize(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog);
-void Lua_OPT_DLG_SetBgColor(CDXUTDialog *dialog);
+
 
 void Lua_OPT_DLG_SetBgColor(CDXUTDialog *dialog,MenuPageLua* page)
 {
@@ -129,7 +73,7 @@ void Lua_OPT_DLG_SetBgColor(CDXUTDialog *dialog,MenuPageLua* page)
 
 void Lua_OPT_DLG_SetSize(CDXUTDialog *dialog,MenuPageLua* page)
 {
-   dialog->SetSize( page->x, page->y );
+   dialog->SetSize( page->width, page->height );
 }
 void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog,MenuPageLua* page)
 {
@@ -139,35 +83,45 @@ void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUT
 }
 
 						
-enum LuaMenuPages{MENU_MAIN,MENU_VIDEO,MENU_AUDIO,MENU_INPUT};
-void Lua_loadGuiMenu(LuaMenuPages type)
+#define MENU_MAIN 0
+#define MENU_VIDEO 1
+#define MENU_AUDIO 2
+#define MENU_INPUT 3
+
+void Lua_loadGuiMenu(int type)
 {
-	char* ScriptName;
-	MenuPageLua *page;
+	char* Name=NULL;
+	MenuPageLua page;
 	switch(type)
 	{
 	case MENU_VIDEO :
-		page=&VideoOpt;ScriptName="VideoMenuOption";break;
+		Name="VideoMenuOption";break;
 	case MENU_AUDIO :
-		page=&MenuOpt;ScriptName="AudioMenuOption";break;
+		Name="AudioMenuOption";break;
 	case MENU_INPUT :
-		page=&MenuOpt;ScriptName="InputMenuOption";break;
+		Name="InputMenuOption";break;
 	case MENU_MAIN:
-		page=&MenuOpt;ScriptName="MainMenuOption";break;
+		Name="MainMenuOption";break;
 	}
-
-	LuaRef t = getGlobal(Lua, ScriptName);
+	
+	LuaRef t = getGlobal(Lua,Name);
 	//TITLE
     LuaRef title = t["title"];
 	std::string txt = title.cast<std::string>();
 	std::wstring wide_string = std::wstring(txt.begin(),txt.end());
-    page->Title = wide_string.c_str();
+    page.Title = wide_string.c_str();
     //POSITION
     LuaRef w = t["x"];
     LuaRef h = t["y"];
 	//fill the C++ struct now
-	page->x = w.cast<int>();
-    page->y = h.cast<int>();
+	page.x = w.cast<int>();
+    page.y = h.cast<int>();
+	//SIZE
+    LuaRef width = t["width"];
+    LuaRef height = t["height"];
+	//fill the C++ struct now
+	page.width =width.cast<int>();
+    page.height = height.cast<int>();
 	//4 CORNERS COLORS
 	//topleft
 	LuaRef TopLeftClr = t["TopLeftClr"];
@@ -175,28 +129,39 @@ void Lua_loadGuiMenu(LuaMenuPages type)
     LuaRef g = TopLeftClr["g"];
 	LuaRef b = TopLeftClr["b"];
     LuaRef a = TopLeftClr["a"];
-	page->Topleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+	page.Topleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
    //topright
 	LuaRef TopRightClr = t["TopRightClr"];
 	 r = TopRightClr["r"];
      g = TopRightClr["g"];
 	 b = TopRightClr["b"];
      a = TopRightClr["a"];
-	 page->Topright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+	 page.Topright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
     //BottomLeftClr
 	LuaRef BottomLeftClr = t["BottomLeftClr"];
 	 r = BottomLeftClr["r"];
      g = BottomLeftClr["g"];
 	 b = BottomLeftClr["b"];
      a = BottomLeftClr["a"];
-	 page->Bottomleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+	 page.Bottomleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
     //BottomRightClr
-	LuaRef BottomRightClr = t["BottomLeftClr"];
+	LuaRef BottomRightClr = t["BottomRightClr"];
 	 r = BottomRightClr["r"];
      g = BottomRightClr["g"];
 	 b = BottomRightClr["b"];
      a = BottomRightClr["a"];
-	 page->Bottomright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+	 page.Bottomright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
+   switch(type)
+	{
+	case MENU_VIDEO :
+		VideoOpt=page;break;
+	case MENU_AUDIO :
+		AudioOpt=page;break;
+	case MENU_INPUT :
+		InputOpt=page;break;
+	case MENU_MAIN:
+		MenuOpt=page;break;
+	}
    
     
 
@@ -206,61 +171,7 @@ void Lua_loadGuiMenu(LuaMenuPages type)
 //--------------------------------------------------------------------------------------
 void InitApp()
 {
-	//TEST start lua binding
 	
-    Lua = luaL_newstate();
-    luaL_dofile(Lua, "script.lua");
-    luaL_openlibs(Lua);
-    lua_pcall(Lua, 0, 0, 0);
-	//LUA OPTIONS
-	//Read Lua struct
-	Lua_loadGuiMenu(MENU_INPUT);
-	Lua_loadGuiMenu(MENU_MAIN);
-	Lua_loadGuiMenu(MENU_VIDEO);
-	Lua_loadGuiMenu(MENU_AUDIO);
-	/*
-    LuaRef t = getGlobal(Lua, "InputMenuOption");
-	//TITLE
-    LuaRef title = t["title"];
-	std::string txt = title.cast<std::string>();
-	std::wstring wide_string = std::wstring(txt.begin(),txt.end());
-    InputOpt.Title = wide_string.c_str();
-    //POSITION
-    LuaRef w = t["x"];
-    LuaRef h = t["y"];
-	//fill the C++ struct now
-	InputOpt.x = w.cast<int>();
-    InputOpt.y = h.cast<int>();
-	//4 CORNERS COLORS
-	//topleft
-	LuaRef TopLeftClr = t["TopLeftClr"];
-	LuaRef r = TopLeftClr["r"];
-    LuaRef g = TopLeftClr["g"];
-	LuaRef b = TopLeftClr["b"];
-    LuaRef a = TopLeftClr["a"];
-	InputOpt.Topleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
-   //topright
-	LuaRef TopRightClr = t["TopRightClr"];
-	 r = TopRightClr["r"];
-     g = TopRightClr["g"];
-	 b = TopRightClr["b"];
-     a = TopRightClr["a"];
-	 InputOpt.Topright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
-    //BottomLeftClr
-	LuaRef BottomLeftClr = t["BottomLeftClr"];
-	 r = BottomLeftClr["r"];
-     g = BottomLeftClr["g"];
-	 b = BottomLeftClr["b"];
-     a = BottomLeftClr["a"];
-	 InputOpt.Bottomleft =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
-    //BottomRightClr
-	LuaRef BottomRightClr = t["BottomLeftClr"];
-	 r = BottomRightClr["r"];
-     g = BottomRightClr["g"];
-	 b = BottomRightClr["b"];
-     a = BottomRightClr["a"];
-	 InputOpt.Bottomright =D3DCOLOR_ARGB( r.cast<int>(),g.cast<int>(),b.cast<int>(), a.cast<int>() ) ;
-	 */
     srand( 0 );
 
     g_Render.pEffect = NULL;
@@ -310,6 +221,18 @@ void InitApp()
     g_Render.InputMenuDlg.SetCallback( OnGUIEvent ); iY = 60;
     g_Render.InputMenuDlg.AddStatic( IDC_STATIC, InputOpt.Title, ( 250 - 125 )/ 2, iY += 24, 125, 22 );
     g_Render.InputMenuDlg.AddButton( IDC_BACK, L"Back", ( 250 - 125 ) / 2, iY += 40, 125, 22 );
+    
+	//TEST start lua binding
+	
+    initLua();
+	//LUA OPTIONS
+	//Read Lua struct
+	Lua_loadGuiMenu(MENU_INPUT);
+	Lua_loadGuiMenu(MENU_MAIN);
+	Lua_loadGuiMenu(MENU_VIDEO);
+	Lua_loadGuiMenu(MENU_AUDIO);
+
+	
    
     // Setup the camera
     D3DXVECTOR3 MinBound( g_MinBound.x + CAMERA_SIZE, g_MinBound.y + CAMERA_SIZE, g_MinBound.z + CAMERA_SIZE );
@@ -825,37 +748,47 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
         g_Camera.SetResetCursorAfterMove( true );
     }
     /// GUI setup
+	 ///COLOR
 	Lua_OPT_DLG_SetBgColor(&g_Render.MainMenuDlg,&MenuOpt);
-    Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.MainMenuDlg,&MenuOpt);
-    /*g_Render.MainMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
-                                      ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );*/
-    g_Render.MainMenuDlg.SetSize( 250, 300 );
+	Lua_OPT_DLG_SetBgColor(&g_Render.AudioMenuDlg,&AudioOpt);
+	Lua_OPT_DLG_SetBgColor(&g_Render.VideoMenuDlg,&VideoOpt);
+	Lua_OPT_DLG_SetBgColor(&g_Render.InputMenuDlg,&InputOpt);
+	 ///Locaton
+	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.MainMenuDlg,&MenuOpt);
+    Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.VideoMenuDlg,&VideoOpt);
+	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.AudioMenuDlg,&AudioOpt);
+	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.InputMenuDlg,&InputOpt);
+     ///SIZE
+	Lua_OPT_DLG_SetSize(&g_Render.MainMenuDlg,&MenuOpt);
+	Lua_OPT_DLG_SetSize(&g_Render.VideoMenuDlg,&VideoOpt);
+    Lua_OPT_DLG_SetSize(&g_Render.AudioMenuDlg,&AudioOpt);
+	Lua_OPT_DLG_SetSize(&g_Render.InputMenuDlg,&InputOpt);
+	//g_Render.MainMenuDlg.SetSize( 250, 300 );
 
     
     //MENU PANEL PLACEMENT
 	//IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
 	//TO WORK INLINE WITH THE RUNNING ENGINE
-	 g_Render.AudioMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
+	/* g_Render.AudioMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
                                                D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
+	 
+  
 	g_Render.AudioMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
      ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
 	g_Render.AudioMenuDlg.SetSize( 250, 300 );
-	
-
+	*/
+/*
     g_Render.VideoMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
                                                D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
+
     g_Render.VideoMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
                                        ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
-    g_Render.VideoMenuDlg.SetSize( 250, 300 );
-	//NEW LUA STUFF
-	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc, &g_Render.VideoMenuDlg,&VideoOpt);
-    Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc, &g_Render.InputMenuDlg,&InputOpt);
-	Lua_OPT_DLG_SetSize(&g_Render.InputMenuDlg,&InputOpt);
-
+    g_Render.VideoMenuDlg.SetSize( 250, 300 );*/
+	
     //PlayBGMusic();
 
     DXUTSetCursorSettings( ( g_GameState.gameMode != GAME_RUNNING ), true );
@@ -1845,7 +1778,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         {
             case GAME_RUNNING:
 				//RenderText();
-            Lua_RenderText(); break;
+            Lua_RenderText(g_Render.pFont,g_Render.pTextSprite,D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) ); break;
             case GAME_MAIN_MENU:
                 V( g_Render.MainMenuDlg.OnRender( fElapsedTime ) ); break;
             case GAME_AUDIO_MENU:

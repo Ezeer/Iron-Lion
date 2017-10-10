@@ -147,7 +147,7 @@
 				FloatingPointModel="2"
 				ForceConformanceInForLoopScope="true"
 				OpenMP="false"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="DXUT.h"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="false"
@@ -735,6 +735,14 @@
 		<Filter
 			Name="Lua"
 			>
+			<File
+				RelativePath=".\script.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\script.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="audio.cpp"

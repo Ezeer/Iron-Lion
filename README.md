@@ -17,7 +17,7 @@ Parts of the future GameEngine :
 * PHYSICS       : Using ... Bullet or other .
 * NETWORK       : Not defined yet ...
 * AI LOGICS     : Using FSM techniques and more...
-* SCRIPTING     : USING LUA ( https://github.com/vinniefalco/LuaBridge )
+* SCRIPTING     : USING LUA ( https://github.com/vinniefalco/LuaBridge , https://eliasdaler.wordpress.com/2014/07/18/using-lua-with-cpp-luabridge/ )
 
 FAQ
 ************************
