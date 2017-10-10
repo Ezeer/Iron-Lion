@@ -11,7 +11,7 @@
 #include "resource.h"
 //LUA
 #include <LuaBridge.h>
-#include <iostream>
+
 extern "C" {
 # include "lua.h"
 # include "lauxlib.h"
@@ -19,7 +19,7 @@ extern "C" {
 }
 //global state
 using namespace luabridge;
-lua_State* LuaState;
+lua_State* Lua;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -45,9 +45,6 @@ lua_State* LuaState;
 // INPUT CONFIGURATION
 #define IDC_INPUT               18
 
-//GUI
-struct MenuPageLua{ const wchar_t*  Title;int x; int y;};
-MenuPageLua InputOpt;
 
 
 
@@ -72,6 +69,40 @@ void UpdateResolutionList( DXUTDeviceSettings* pDS );
 CFirstPersonCamera  g_Camera;
 RENDER_STATE        g_Render;
 GAME_STATE          g_GameState;
+//LUA EXPERIMENT
+
+struct MenuPageLua{ const wchar_t*  Title;int x; int y;};
+MenuPageLua InputOpt;
+
+void printLuaMessage() 
+{
+   // std::cout << s << std::endl;
+}
+void Lua_RenderText()
+{
+
+    CDXUTTextHelper txtHelper( g_Render.pFont, g_Render.pTextSprite, 15 );
+    txtHelper.Begin();
+    txtHelper.SetInsertionPos( 2, 0 );
+    txtHelper.SetForegroundColor( D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) );
+    txtHelper.DrawTextLine( DXUTGetFrameStats( true ) );
+    txtHelper.DrawTextLine( DXUTGetDeviceStats() );
+    /*
+	txtHelper.DrawTextLine( L"X: Add Droid  Y: Toggle Droid Movement  B: Mass Kill" );
+    txtHelper.DrawFormattedTextLine( L"Pos: %0.2f, %0.2f, %0.2f", g_Camera.GetEyePt()->x, g_Camera.GetEyePt()->y,
+                                     g_Camera.GetEyePt()->z );*/
+	//LUA REDESIGN
+	
+	getGlobalNamespace(Lua).addFunction("printMessage", printLuaMessage);
+    luaL_dofile(Lua, "script.lua");
+    lua_pcall(Lua, 0, 0, 0);
+    LuaRef sumNumbers = getGlobal(Lua, "sumNumbers");
+    int result = sumNumbers(5, 4);
+	txtHelper.DrawTextLine( L" Lua console" );
+    txtHelper.DrawFormattedTextLine( L"Lua say : %d",result  );
+    txtHelper.End();
+}
+
 //GUI
 //MENU PANEL PLACEMENT
 //IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
@@ -81,7 +112,7 @@ void MenuDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,int Wminu
 
 void MenuDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,int WminusX, int HminusY)
 {
-	 g_Render.AudioMenuDlg.SetLocation(( pBackBufferSurfaceDesc->Width - WminusX ) / 2,
+	 g_Render.InputMenuDlg.SetLocation(( pBackBufferSurfaceDesc->Width - WminusX ) / 2,
                                        ( pBackBufferSurfaceDesc->Height - HminusY ) / 2 );
   
 }
@@ -92,13 +123,13 @@ void MenuDlg_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,int Wminu
 //--------------------------------------------------------------------------------------
 void InitApp()
 {
-	//start lua binding
+	//TEST start lua binding
 	
-    LuaState = luaL_newstate();
-    luaL_dofile(LuaState, "script.lua");
-    luaL_openlibs(LuaState);
-    lua_pcall(LuaState, 0, 0, 0);
-    LuaRef t = getGlobal(LuaState, "InputMenuOption");
+    Lua = luaL_newstate();
+    luaL_dofile(Lua, "script.lua");
+    luaL_openlibs(Lua);
+    lua_pcall(Lua, 0, 0, 0);
+    LuaRef t = getGlobal(Lua, "InputMenuOption");
     LuaRef title = t["title"];
     LuaRef w = t["x"];
     LuaRef h = t["y"];
@@ -130,7 +161,8 @@ void InitApp()
         // adding input configuration panel
 	g_Render.MainMenuDlg.AddButton( IDC_INPUT, L"Input", ( 250 - 125 ) / 2, iY += 30, 125, 22, 'I' );
     g_Render.MainMenuDlg.AddButton( IDC_QUIT, L"Quit", ( 250 - 125 ) / 2, iY += 60, 125, 22, 'Q' );
-    // Init Music panel
+    
+	// Init Music panel
     g_Render.AudioMenuDlg.Init( &g_Render.DialogResourceManager );
     g_Render.AudioMenuDlg.SetCallback( OnGUIEvent ); iY = 60;
     g_Render.AudioMenuDlg.AddStatic( IDC_STATIC, L"Music Volume", ( 250 - 125 ) / 2, iY += 24, 125, 22 );
@@ -692,9 +724,13 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
     //MENU PANEL PLACEMENT
 	//IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
 	//TO WORK INLINE WITH THE RUNNING ENGINE
-	 g_Render.AudioMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
+	 g_Render.AudioMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
+                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
+                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
+                                               D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
+	g_Render.AudioMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
      ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
-	MenuDlg_SetLocation(pBackBufferSurfaceDesc,800,100);
+	//MenuDlg_SetLocation(pBackBufferSurfaceDesc,800,100);
 
     g_Render.VideoMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
                                                D3DCOLOR_ARGB( 200, 54, 105, 192 ),
@@ -704,7 +740,7 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
                                        ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
     g_Render.VideoMenuDlg.SetSize( 250, 300 );
 
-    PlayBGMusic();
+    //PlayBGMusic();
 
     DXUTSetCursorSettings( ( g_GameState.gameMode != GAME_RUNNING ), true );
 
@@ -865,9 +901,7 @@ void DroidChooseNewTask( int A )
     }
 }
 
-//***********************************************************************************
-//FUN STUFF WITH AI !
-//--------------------------------------------------------------------------------------
+
 void HandleDroidAI( float fElapsedTime )
 {
     for( int A = 0; A < MAX_DROID; A++ )
@@ -885,6 +919,8 @@ void HandleDroidAI( float fElapsedTime )
 
             switch( g_GameState.DroidQ[A].aiState )
             {
+				//Exemple idea with lua 
+				// Make a func AI_Turning() in lua that will be called by the c++ version below
                 case AI_TURNING:
                 {
                     g_GameState.DroidQ[A].fRotInterp += fElapsedTime;
@@ -1692,7 +1728,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         switch( g_GameState.gameMode )
         {
             case GAME_RUNNING:
-                RenderText(); break;
+            Lua_RenderText(); break;//RenderText()
             case GAME_MAIN_MENU:
                 V( g_Render.MainMenuDlg.OnRender( fElapsedTime ) ); break;
             case GAME_AUDIO_MENU:
