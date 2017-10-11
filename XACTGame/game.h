@@ -7,6 +7,7 @@
 #include "DXUTcamera.h"
 #include "DXUTsettingsdlg.h"
 #include "SDKmesh.h"
+//#include "Ai.h"
 
 //--------------------------------------------------------------------------------------
 // Consts
@@ -39,17 +40,10 @@
 #define MAX_SOUND_VELOCITY 1.0f // MAX_SOUND_VELOCITY is the velocity at which the bouncing sound is played at maximum volume.  Higher velocity uses maximum volume.
 #define MIN_SOUND_VELOCITY 0.07f  // MIN_SOUND_VELOCITY is the minimum contact velocity required to make a sound.
 #define MIN_VOL_ADJUST 0.8f  // MIN_VOL_ADJUST is the minimum volume adjustment based on contact velocity.
-
+/*
 // MinBound and MaxBound are the bounding box representing the cell mesh.
 const D3DXVECTOR3           g_MinBound( -6.0f, -GROUND_Y, -6.0f );
 const D3DXVECTOR3           g_MaxBound( 6.0f, GROUND_Y, 6.0f );
-
-enum AI_STATE
-{
-    AI_TURNING = 1,
-    AI_MOVING,
-    AI_STOPPED,
-};
 
 enum GAME_MODE
 {   
@@ -60,8 +54,7 @@ enum GAME_MODE
     GAME_VIDEO_MENU,
     GAME_INPUT_MENU
 };
-
-
+*/
 //--------------------------------------------------------------------------------------
 // Class definations
 //--------------------------------------------------------------------------------------
@@ -118,7 +111,7 @@ struct RENDER_STATE
     RECT rcAdapterWork[10];
     CGrowableArray <D3DDISPLAYMODE> aWindowedDMList;
 };
-
+/*
 struct AMMO_STATE
 {
     D3DXMATRIXA16 mAmmoRot;
@@ -132,27 +125,9 @@ struct AMMO_STATE
     float fAlpha;
     bool bGround;    // Whether it is laying on the ground (resting or rolling)
 };
+*/
 
-struct DROID_STATE
-{
-    bool bActive;
-    D3DXVECTOR3 vPosition;
-    D3DXVECTOR3 vVelocity;
-
-    D3DXVECTOR3 vNudgeVelocity;
-    AI_STATE aiState;
-    float fTargetRotation;
-    D3DXQUATERNION qTarget;
-    D3DXQUATERNION qStart;
-    D3DXQUATERNION qCurrent;
-    float fRotInterp;
-    float fTaskTimer;
-    int nHitPoints;
-    float fDeathAnimation;
-    float fAlpha;
-    D3DXCOLOR Specular;
-};
-
+/*
 struct GAME_STATE
 {
     AMMO_STATE      AmmoQ[MAX_AMMO];    // Queue of ammos in the world
@@ -176,14 +151,14 @@ struct GAME_STATE
 
     GAME_MODE gameMode;
 };
-
+*/
 
 //--------------------------------------------------------------------------------------
 // Global variables
 //--------------------------------------------------------------------------------------
 extern CFirstPersonCamera   g_Camera;
 extern RENDER_STATE         g_RenderState;
-extern GAME_STATE           g_GameState;
+//GAME_STATE           g_GameState;
 
 
 //--------------------------------------------------------------------------------------

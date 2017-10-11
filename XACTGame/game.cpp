@@ -58,7 +58,8 @@ void UpdateResolutionList( DXUTDeviceSettings* pDS );
 //--------------------------------------------------------------------------------------
 CFirstPersonCamera  g_Camera;
 extern RENDER_STATE g_Render;
-GAME_STATE          g_GameState;
+GAME_STATE  g_GameState;
+//extern AI_STATE aiState;
 
 //GUI
 //LUA STUFF NOW ...

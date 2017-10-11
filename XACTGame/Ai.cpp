@@ -1,7 +1,11 @@
 #include "Ai.h"
 #include "DXUT.h"
 #include "SDKmisc.h"
-#include "game.h"
+//#include "game.h"
+//externs
+extern GAME_STATE g_GameState;
+enum AI_STATE aiState;
+
 ///*****************************************************
 /// PART OF AI
 //--------------------------------------------------------------------------------------
