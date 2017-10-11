@@ -66,11 +66,13 @@ struct RENDER_STATE
 
     ID3DXFont* pFont;        // Font for drawing text
     ID3DXSprite* pTextSprite;  // Sprite for batching draw text calls
+	
     CDXUTDialogResourceManager DialogResourceManager; // manager for shared resources of dialogs
     CDXUTDialog MainMenuDlg;  // dialog for main menu
     CDXUTDialog VideoMenuDlg;  // dialog for video menu
     CDXUTDialog AudioMenuDlg;  // dialog for audio menu
 	CDXUTDialog InputMenuDlg;  // dialog for audio menu
+	CDXUTDialog SplashScreenDlg;  // dialog for audio menu
 
     ID3DXEffect* pEffect;      // D3DX effect interface
     IDirect3DTexture9* pDefaultTex;  // Default texture for un-textured geometry.

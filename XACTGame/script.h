@@ -15,6 +15,7 @@ extern "C" {
 #define MENU_VIDEO 1
 #define MENU_AUDIO 2
 #define MENU_INPUT 3
+
 //global state
 using namespace luabridge;
 extern lua_State* Lua;

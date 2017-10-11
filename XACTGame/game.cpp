@@ -34,7 +34,7 @@
 #define IDC_SPLASH              17
 // INPUT CONFIGURATION
 #define IDC_INPUT               18
-
+#define SPLASH 19
 
 
 
@@ -59,15 +59,10 @@ void UpdateResolutionList( DXUTDeviceSettings* pDS );
 CFirstPersonCamera  g_Camera;
 extern RENDER_STATE g_Render;
 GAME_STATE  g_GameState;
-//extern AI_STATE aiState;
 
-//GUI
-//LUA STUFF NOW ...
-//c++ side
-
-
-
-
+void Lua_loadSplash()
+{
+}
 //--------------------------------------------------------------------------------------
 // Initialize the app 
 //--------------------------------------------------------------------------------------
@@ -85,12 +80,22 @@ void InitApp()
     g_Render.bDetectOptimalSettings = true;
 
     // Initialize dialogs
-    g_Render.MainMenuDlg.Init( &g_Render.DialogResourceManager );
-    g_Render.MainMenuDlg.SetCallback( OnGUIEvent ); int iY = ( ( 300 - 30 * 6 ) / 2 );
+	// SPLASH NEW
+	g_Render.SplashScreenDlg.Init( &g_Render.DialogResourceManager );
+    g_Render.SplashScreenDlg.SetCallback( OnGUIEvent ); 
+    g_Render.SplashScreenDlg.SetTexture(0,L"concrete.tga");
+	g_GameState.gameMode=GAME_SPLASH;
+    int iY = ( ( 300 - 30 * 6 ) / 2 );
+	g_Render.MainMenuDlg.Init( &g_Render.DialogResourceManager );
+	 //TEXTURE test ...
+	
+	g_Render.MainMenuDlg.SetTexture(0,L"concrete.tga");
+    g_Render.MainMenuDlg.SetCallback( OnGUIEvent ); 
     g_Render.MainMenuDlg.AddButton( IDC_AUDIO, L"Audio", ( 250 - 125 ) / 2, iY += 30, 125, 22 );
     g_Render.MainMenuDlg.AddButton( IDC_VIDEO, L"Video", ( 250 - 125 ) / 2, iY += 30, 125, 22 );
     g_Render.MainMenuDlg.AddButton( IDC_RESUME, L"Resume", ( 250 - 125 ) / 2, iY += 30, 125, 22 );
-        // adding input configuration panel
+   
+	// adding input configuration panel
 	g_Render.MainMenuDlg.AddButton( IDC_INPUT, L"Input", ( 250 - 125 ) / 2, iY += 30, 125, 22, 'I' );
     g_Render.MainMenuDlg.AddButton( IDC_QUIT, L"Quit", ( 250 - 125 ) / 2, iY += 60, 125, 22, 'Q' );
     
@@ -123,16 +128,17 @@ void InitApp()
     g_Render.InputMenuDlg.SetCallback( OnGUIEvent ); iY = 60;
     g_Render.InputMenuDlg.AddStatic( IDC_STATIC, InputOpt.Title, ( 250 - 125 )/ 2, iY += 24, 125, 22 );
     g_Render.InputMenuDlg.AddButton( IDC_BACK, L"Back", ( 250 - 125 ) / 2, iY += 40, 125, 22 );
-    
-	//TEST start lua binding
+    g_Render.InputMenuDlg.SetTexture(0,L"concrete.tga");
+	//TEST LUA  : start lua binding
 	
     initLua();
 	//LUA OPTIONS
-	//Read Lua struct
+	//Read and store Lua file data structs
 	Lua_loadGuiMenu(MENU_INPUT);
 	Lua_loadGuiMenu(MENU_MAIN);
 	Lua_loadGuiMenu(MENU_VIDEO);
 	Lua_loadGuiMenu(MENU_AUDIO);
+	Lua_loadSplash();
 
 	
    
@@ -148,7 +154,7 @@ void InitApp()
     g_Camera.SetViewParams( &vecEye, &vecAt );
 
     ZeroMemory( &g_GameState, sizeof( GAME_STATE ) );
-    g_GameState.gameMode = GAME_RUNNING;
+    g_GameState.gameMode = GAME_SPLASH;
     g_GameState.nAmmoCount = 0;
     g_GameState.fAmmoColorLerp = 1000.0f;
     g_GameState.BlendFromColor = D3DXCOLOR( 0.6f, 0, 0, 1 );
@@ -296,7 +302,7 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
     return true;
 }
 
-
+//MESH DROID
 struct DROID_VERTEX
 {
     D3DXVECTOR3 pos;
@@ -634,7 +640,7 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
 
     // Create a sprite to help batch calls when drawing many lines of text
     V_RETURN( D3DXCreateSprite( pd3dDevice, &g_Render.pTextSprite ) );
-
+    
     // Setup the camera's projection parameters
     float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
     g_Camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 0.1f, 1000.0f );
@@ -655,41 +661,24 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
 	Lua_OPT_DLG_SetBgColor(&g_Render.AudioMenuDlg,&AudioOpt);
 	Lua_OPT_DLG_SetBgColor(&g_Render.VideoMenuDlg,&VideoOpt);
 	Lua_OPT_DLG_SetBgColor(&g_Render.InputMenuDlg,&InputOpt);
+	Lua_OPT_DLG_SetBgColor(&g_Render.SplashScreenDlg,&InputOpt);//<<-----TODOOO change InputOpt
 	 ///Locaton
+	
 	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.MainMenuDlg,&MenuOpt);
     Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.VideoMenuDlg,&VideoOpt);
 	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.AudioMenuDlg,&AudioOpt);
 	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.InputMenuDlg,&InputOpt);
-     ///SIZE
+    Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.SplashScreenDlg,&InputOpt);
+    
+	///SIZE
+	
 	Lua_OPT_DLG_SetSize(&g_Render.MainMenuDlg,&MenuOpt);
 	Lua_OPT_DLG_SetSize(&g_Render.VideoMenuDlg,&VideoOpt);
     Lua_OPT_DLG_SetSize(&g_Render.AudioMenuDlg,&AudioOpt);
 	Lua_OPT_DLG_SetSize(&g_Render.InputMenuDlg,&InputOpt);
-	//g_Render.MainMenuDlg.SetSize( 250, 300 );
-
+	Lua_OPT_DLG_SetSize(&g_Render.SplashScreenDlg,&InputOpt);
     
-    //MENU PANEL PLACEMENT
-	//IDEA FOR FUTUR IS TO MAKE A GLOBAL FUNCTION , AND BIND WITH LUA TO BEING ABLE TO USE SCRIPTS THEN
-	//TO WORK INLINE WITH THE RUNNING ENGINE
-	/* g_Render.AudioMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
-                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                               D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
-	 
-  
-	g_Render.AudioMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
-     ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
-	g_Render.AudioMenuDlg.SetSize( 250, 300 );
-	*/
-/*
-    g_Render.VideoMenuDlg.SetBackgroundColors( D3DCOLOR_ARGB( 200, 98, 138, 206 ),
-                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                               D3DCOLOR_ARGB( 200, 54, 105, 192 ),
-                                               D3DCOLOR_ARGB( 200, 10, 73, 179 ) );
 
-    g_Render.VideoMenuDlg.SetLocation( ( pBackBufferSurfaceDesc->Width - 250 ) / 2,
-                                       ( pBackBufferSurfaceDesc->Height - 300 ) / 2 );
-    g_Render.VideoMenuDlg.SetSize( 250, 300 );*/
 	
     //PlayBGMusic();
 
@@ -1611,6 +1600,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
                 V( g_Render.VideoMenuDlg.OnRender( fElapsedTime ) ); break;
 			case GAME_INPUT_MENU:
                 V( g_Render.InputMenuDlg.OnRender( fElapsedTime ) ); break;
+		    case GAME_SPLASH:
+				 V( g_Render.SplashScreenDlg.OnRender( fElapsedTime ) ); break;
         }
 
         V( pd3dDevice->EndScene() );
@@ -1850,7 +1841,7 @@ void CALLBACK OnGUIEvent( UINT nEvent, int nControlID, CDXUTControl* pControl, v
     switch( nControlID )
     {
         case IDC_RESUME:
-            g_GameState.gameMode = GAME_RUNNING;
+            g_GameState.gameMode =GAME_RUNNING; //GAME_RUNNING;
             DXUTSetCursorSettings( false, true );
             break;
         case IDC_BACK:
@@ -1971,6 +1962,8 @@ void ToggleMenu()
             g_GameState.gameMode = GAME_MAIN_MENU; break;
 		case GAME_INPUT_MENU:
             g_GameState.gameMode = GAME_MAIN_MENU; break;
+		case GAME_SPLASH:
+            g_GameState.gameMode = GAME_RUNNING; break;
     }
 
     DXUTSetCursorSettings( ( g_GameState.gameMode != GAME_RUNNING ), true );
