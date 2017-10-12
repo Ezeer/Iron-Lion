@@ -1,3 +1,34 @@
+SplashScreen = {
+    title = "splash.png",
+    x = 250,
+    y = 300,
+	width = 250,
+	height = 300,
+	TopLeftClr={
+	  r=92,
+	  g = 92,
+	  b = 92,
+	  a = 206
+	},
+	TopRightClr={
+	  r = 92,
+	  g = 92,
+	  b = 92,
+	  a = 192
+	},
+	BottomLeftClr={
+	  r = 92,
+	  g = 92,
+	  b = 92,
+	  a = 192
+	},
+	BottomRightClr={
+	  r = 92,
+	  g = 92,
+	  b = 92,
+	  a = 179
+	}
+}
 MainMenuOption = {
     title = "Options",
     x = 250,

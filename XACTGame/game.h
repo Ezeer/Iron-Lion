@@ -72,11 +72,13 @@ struct RENDER_STATE
     CDXUTDialog VideoMenuDlg;  // dialog for video menu
     CDXUTDialog AudioMenuDlg;  // dialog for audio menu
 	CDXUTDialog InputMenuDlg;  // dialog for audio menu
-	CDXUTDialog SplashScreenDlg;  // dialog for audio menu
+
 
     ID3DXEffect* pEffect;      // D3DX effect interface
     IDirect3DTexture9* pDefaultTex;  // Default texture for un-textured geometry.
     IDirect3DTexture9* pDefaultNormalMap; // Default normal map texture for un-normal maped geometry
+    IDirect3DTexture9* pSplashScreen;
+	ID3DXSprite*	   pSplashSprite;	
 
     IDirect3DTexture9* pDroidNormalMap;
 

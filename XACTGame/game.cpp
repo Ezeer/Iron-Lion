@@ -34,9 +34,18 @@
 #define IDC_SPLASH              17
 // INPUT CONFIGURATION
 #define IDC_INPUT               18
-#define SPLASH 19
 
 
+
+
+
+
+//--------------------------------------------------------------------------------------
+// Global variables
+//--------------------------------------------------------------------------------------
+CFirstPersonCamera  g_Camera;
+extern RENDER_STATE g_Render;
+GAME_STATE  g_GameState;
 
 //--------------------------------------------------------------------------------------
 // Forward declarations 
@@ -51,18 +60,49 @@ void RenderText();
 void ToggleMenu();
 void UpdateAspectRatioList( DXUTDeviceSettings* pDS );
 void UpdateResolutionList( DXUTDeviceSettings* pDS );
-
-
-//--------------------------------------------------------------------------------------
-// Global variables
-//--------------------------------------------------------------------------------------
-CFirstPersonCamera  g_Camera;
-extern RENDER_STATE g_Render;
-GAME_STATE  g_GameState;
-
-void Lua_loadSplash()
+//new
+void loadTexture(const wchar_t* fileName);
+//...
+void loadTexture(const wchar_t* fileName)
 {
+	HRESULT hr;
+	
+	IDirect3DTexture9* SplScreen=0;
+	IDirect3DDevice9* pd3dDevice=DXUTGetD3D9Device();
+   
+	if(!FAILED(D3DXCreateTextureFromFile(pd3dDevice, fileName, &g_Render.pSplashScreen)))
+	{
+			if(FAILED(D3DXCreateSprite(pd3dDevice,&g_Render.pSplashSprite)))
+				MessageBox(0,L"loadTexture",L"FAILED",MB_OK);
+    
+
+	}
+	
+
 }
+
+void Splash()
+{
+	if(!g_Render.pSplashSprite)return;
+	g_Render.pSplashSprite->Begin(D3DXSPRITE_ALPHABLEND);
+		{
+			const D3DSURFACE_DESC* desc=DXUTGetD3D9BackBufferSurfaceDesc();
+            int width=desc->Width;
+			int height=desc->Height;
+			//to center we need to know :
+			//_ the size of the sprite
+			D3DXIMAGE_INFO inf;
+			D3DXGetImageInfoFromFile(L"splash.png",&inf);
+			int left=(width-inf.Width)/2;
+		    int top=(height-inf.Height)/2;
+
+			D3DXVECTOR3 v=D3DXVECTOR3(left,top,0);
+			g_Render.pSplashSprite->Draw(g_Render.pSplashScreen,NULL,NULL,&v,0xFFFFFFFF);
+		}
+		g_Render.pSplashSprite->End();
+}
+
+
 //--------------------------------------------------------------------------------------
 // Initialize the app 
 //--------------------------------------------------------------------------------------
@@ -73,22 +113,18 @@ void InitApp()
 
     g_Render.pEffect = NULL;
     g_Render.pDefaultTex = NULL;
+    g_Render.pSplashScreen = NULL;
+    g_Render.pSplashSprite= NULL;
     g_Render.UseFixedFunction = 0.0f;
     g_Render.ForceShader = 0;
     g_Render.MaximumResolution = 4096.0f;
     g_Render.DisableSpecular = 0.0f;
     g_Render.bDetectOptimalSettings = true;
-
-    // Initialize dialogs
-	// SPLASH NEW
-	g_Render.SplashScreenDlg.Init( &g_Render.DialogResourceManager );
-    g_Render.SplashScreenDlg.SetCallback( OnGUIEvent ); 
-    g_Render.SplashScreenDlg.SetTexture(0,L"concrete.tga");
-	g_GameState.gameMode=GAME_SPLASH;
     int iY = ( ( 300 - 30 * 6 ) / 2 );
+    // Initialize dialogs
 	g_Render.MainMenuDlg.Init( &g_Render.DialogResourceManager );
 	 //TEXTURE test ...
-	
+
 	g_Render.MainMenuDlg.SetTexture(0,L"concrete.tga");
     g_Render.MainMenuDlg.SetCallback( OnGUIEvent ); 
     g_Render.MainMenuDlg.AddButton( IDC_AUDIO, L"Audio", ( 250 - 125 ) / 2, iY += 30, 125, 22 );
@@ -401,6 +437,8 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 
     V_RETURN( g_Render.DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
 
+	//Create the splash screen 
+	loadTexture(L"splash.png");
     // Initialize the font
     V_RETURN( D3DXCreateFont( pd3dDevice, 15, 0, FW_BOLD, 1, FALSE, DEFAULT_CHARSET,
                               OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
@@ -656,28 +694,26 @@ HRESULT CALLBACK OnResetDevice( IDirect3DDevice9* pd3dDevice,
         g_Camera.SetResetCursorAfterMove( true );
     }
     /// GUI setup
+	
 	 ///COLOR
 	Lua_OPT_DLG_SetBgColor(&g_Render.MainMenuDlg,&MenuOpt);
 	Lua_OPT_DLG_SetBgColor(&g_Render.AudioMenuDlg,&AudioOpt);
 	Lua_OPT_DLG_SetBgColor(&g_Render.VideoMenuDlg,&VideoOpt);
 	Lua_OPT_DLG_SetBgColor(&g_Render.InputMenuDlg,&InputOpt);
-	Lua_OPT_DLG_SetBgColor(&g_Render.SplashScreenDlg,&InputOpt);//<<-----TODOOO change InputOpt
-	 ///Locaton
 	
+	 ///Locaton
 	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.MainMenuDlg,&MenuOpt);
     Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.VideoMenuDlg,&VideoOpt);
 	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.AudioMenuDlg,&AudioOpt);
 	Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.InputMenuDlg,&InputOpt);
-    Lua_OPT_DLG_SetLocation(pBackBufferSurfaceDesc,&g_Render.SplashScreenDlg,&InputOpt);
-    
+   
 	///SIZE
 	
 	Lua_OPT_DLG_SetSize(&g_Render.MainMenuDlg,&MenuOpt);
 	Lua_OPT_DLG_SetSize(&g_Render.VideoMenuDlg,&VideoOpt);
     Lua_OPT_DLG_SetSize(&g_Render.AudioMenuDlg,&AudioOpt);
 	Lua_OPT_DLG_SetSize(&g_Render.InputMenuDlg,&InputOpt);
-	Lua_OPT_DLG_SetSize(&g_Render.SplashScreenDlg,&InputOpt);
-    
+	
 
 	
     //PlayBGMusic();
@@ -1601,7 +1637,9 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 			case GAME_INPUT_MENU:
                 V( g_Render.InputMenuDlg.OnRender( fElapsedTime ) ); break;
 		    case GAME_SPLASH:
-				 V( g_Render.SplashScreenDlg.OnRender( fElapsedTime ) ); break;
+               {   Splash();
+					break;
+				}
         }
 
         V( pd3dDevice->EndScene() );
@@ -1638,7 +1676,9 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bo
     g_Render.DialogResourceManager.MsgProc( hWnd, uMsg, wParam, lParam );
 
     switch( g_GameState.gameMode )
-    {
+    {   
+		case GAME_SPLASH:
+          break;
         case GAME_RUNNING:
             g_Camera.HandleMessages( hWnd, uMsg, wParam, lParam ); break;
         case GAME_MAIN_MENU:
@@ -1840,6 +1880,8 @@ void CALLBACK OnGUIEvent( UINT nEvent, int nControlID, CDXUTControl* pControl, v
 {
     switch( nControlID )
     {
+		case IDC_SPLASH:
+            g_GameState.gameMode =GAME_RUNNING; //GAME_RUNNING;
         case IDC_RESUME:
             g_GameState.gameMode =GAME_RUNNING; //GAME_RUNNING;
             DXUTSetCursorSettings( false, true );
@@ -2038,7 +2080,9 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
     SAFE_RELEASE( g_Render.pEffect );
     SAFE_RELEASE( g_Render.pFont );
     SAFE_RELEASE( g_Render.pDefaultTex );
-    SAFE_RELEASE( g_Render.pDefaultNormalMap );
+	SAFE_RELEASE( g_Render.pSplashScreen );//new
+	SAFE_RELEASE( g_Render.pSplashSprite );//new
+	SAFE_RELEASE( g_Render.pDefaultNormalMap );
     SAFE_RELEASE( g_Render.pDroidNormalMap );
     g_Render.meshCell.Destroy();
     g_Render.meshAmmo.Destroy();

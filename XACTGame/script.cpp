@@ -9,6 +9,7 @@
  MenuPageLua InputOpt;
  MenuPageLua VideoOpt;
  MenuPageLua AudioOpt;
+
  CDXUTTextHelper *txtHelper;
  
  
@@ -57,6 +58,7 @@ void Lua_loadGuiMenu(int type)
     LuaRef w = t["x"];
     LuaRef h = t["y"];
 	//fill the C++ struct now
+	page.splash=false;
 	page.x = w.cast<int>();
     page.y = h.cast<int>();
 	//SIZE
@@ -118,9 +120,12 @@ void Lua_OPT_DLG_SetSize(CDXUTDialog *dialog,MenuPageLua* page)
 }
 void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog,MenuPageLua* page)
 {
-	
+	if(!page->splash)
     dialog->SetLocation( ( pBackBufferSurfaceDesc->Width - page->x) / 2,
      ( pBackBufferSurfaceDesc->Height - page->y ) / 2 );
+	else
+		dialog->SetLocation( 0,0);
+
 }
 
 						
@@ -157,4 +162,24 @@ void Lua_RenderText(ID3DXFont* pFont,ID3DXSprite* pTextSprite,D3DXCOLOR cl)
 	txtHelper.DrawTextLine( L" Lua console" );
     txtHelper.DrawFormattedTextLine( L"Lua say : %d",result  );
     txtHelper.End();
+}
+
+void Lua_loadSplash()
+{
+	LuaRef t = getGlobal(Lua,"SplashScreen");
+	//TITLE
+    LuaRef title = t["title"];
+	std::string txt = title.cast<std::string>();
+	std::wstring wide_string = std::wstring(txt.begin(),txt.end());
+   
+    //POSITION
+    LuaRef w = t["x"];
+    LuaRef h = t["y"];
+	
+	//SIZE
+    LuaRef width = t["width"];
+    LuaRef height = t["height"];
+	//fill the C++ struct now
+	
+	
 }

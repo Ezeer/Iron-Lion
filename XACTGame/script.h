@@ -20,11 +20,13 @@ extern "C" {
 using namespace luabridge;
 extern lua_State* Lua;
 void initLua();
+
 extern struct MenuPageLua{ const wchar_t*  Title;
                    int x; 
 				   int y;
 				   int width;
 				   int height;
+				   bool splash;
 				   D3DCOLOR Topleft;
 				   D3DCOLOR Topright;
 				   D3DCOLOR Bottomleft;
@@ -34,6 +36,7 @@ extern MenuPageLua MenuOpt;
 extern MenuPageLua InputOpt;
 extern MenuPageLua VideoOpt;
 extern MenuPageLua AudioOpt;
+
 #include "SDKmisc.h"
 #include "game.h"
 extern CDXUTTextHelper *txtHelper;
@@ -43,6 +46,7 @@ void Lua_RenderText(ID3DXFont* pFont,ID3DXSprite* pTextSprite,D3DXCOLOR cl);  //
 void Lua_OPT_DLG_SetBgColor(CDXUTDialog *dialog,MenuPageLua* page);
 void Lua_OPT_DLG_SetSize(CDXUTDialog *dialog,MenuPageLua* page);
 void Lua_OPT_DLG_SetLocation(const D3DSURFACE_DESC* pBackBufferSurfaceDesc,CDXUTDialog *dialog,MenuPageLua* page);
+void Lua_loadSplash();
 
 
 						
