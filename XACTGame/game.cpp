@@ -493,7 +493,7 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
     g_Render.meshAmmo.Create( pd3dDevice, wsz );
 
 	//SETup AI here with gameMode.DroidQ[i] ? 
-    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"Airship\\airship.x" ) );
+    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"BA2\\BA-2.x" ) );
     g_Render.meshDroid.Create( pd3dDevice, wsz );
     //collision debug
     V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"boundingbox.x" ) );
