@@ -55,11 +55,11 @@ void setupLog(const char* filename)
 {
 	logfile = fopen(filename, "a");
        Output2FILE::Stream() = logfile;
-        FILELog::ReportingLevel() = logINFO;
-	      FILE_LOG(logDEBUG) << "Iron-Lionstarted !";
+        FILELog::ReportingLevel() = logDEBUG;
+	      FILE_LOG(logDEBUG) << "Iron-Lion started !";
 }
 
-void closeLog(){if(logfile)fclose(logfile);}
+void closeLog(){if(logfile){ FILE_LOG(logDEBUG) << "Iron-Lion Exited !";fclose(logfile);}}
 
 
 //--------------------------------------------------------------------------------------
@@ -493,11 +493,11 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
     g_Render.meshAmmo.Create( pd3dDevice, wsz );
 
 	//SETup AI here with gameMode.DroidQ[i] ? 
-    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"droid\\evildrone.x" ) );
+    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"Airship\\airship.x" ) );
     g_Render.meshDroid.Create( pd3dDevice, wsz );
-    /*collision debug
+    //collision debug
     V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"boundingbox.x" ) );
-     g_Render.meshDroidCollision.Create( pd3dDevice, wsz );*/
+     g_Render.meshDroidCollision.Create( pd3dDevice, wsz );
     V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"droid\\evildrone-low.x" ) );
     g_Render.meshDroidLow.Create( pd3dDevice, wsz );
     // Create a new vertex declaration to hold all the required data
@@ -1559,6 +1559,12 @@ void RenderDroid( IDirect3DDevice9* pd3dDevice, int A, D3DXMATRIXA16& mView, D3D
             g_Render.meshDroidLow.Render( g_Render.pEffect, g_Render.hDiffuseTexture, NULL, 0, NULL, 0, NULL, true,
                                           false );
     }
+	//JUST FOR TEST ... 
+	// Set render mode to unlit, wireframe triangles
+            pd3dDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_WIREFRAME );
+            //pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+    g_Render.meshDroidCollision.Render( g_Render.pEffect, g_Render.hDiffuseTexture, NULL, 0, NULL, 0, NULL, true,false );
+	  pd3dDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );
 
     g_Render.pEffect->SetTexture( g_Render.hNormalMap, g_Render.pDefaultNormalMap );
     V( g_Render.pEffect->SetFloat( g_Render.hAnimation, 0.0f ) );
@@ -1605,6 +1611,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
         g_Render.meshCell.Render( g_Render.pEffect, g_Render.hDiffuseTexture, g_Render.hDiffuse, 0, g_Render.hSpecular,
                                   0, g_Render.hPower, true, false );
+		 //g_Render.meshDroidCollision.Render(pd3dDevice);
+
 
         // Render opaque objects first
         if( g_GameState.nAmmoCount > 0 )
