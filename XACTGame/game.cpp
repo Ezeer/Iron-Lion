@@ -2108,7 +2108,8 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
     g_Render.meshDroidExplosionLow.Destroy();
     int i;
 	for(i=0;i<MAX_DROID;i++)
-	{ g_GameState.DroidQ[i].
+	{ 
+	g_GameState.DroidQ[i].meshDroidCollision.Destroy();
     SAFE_RELEASE( g_Render.pMeshDroidExplosion );
 }
 
