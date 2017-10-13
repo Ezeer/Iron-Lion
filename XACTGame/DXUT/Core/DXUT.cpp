@@ -1839,6 +1839,7 @@ HRESULT WINAPI DXUTMainLoop( HACCEL hAccel )
         {
             // Render a frame during idle time (no messages are waiting)
             DXUTRender3DEnvironment();
+			//DO AI STUFF WITH LUA
         }
     }
 

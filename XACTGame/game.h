@@ -20,7 +20,7 @@
 #define MAX_DROID 50
 #define DROID_HITPOINTS 20
 #define AMMO_SIZE 0.10f // AMMO_SIZE is the diameter of the ball mesh in the world.
-#define DROID_SIZE 0.5f
+#define DROID_SIZE 0.2f
 #define DROID_MIN_HEIGHT 0.5f
 #define DROID_HEIGHT_FLUX 0.5f
 #define DROID_TURN_AI_PERCENT 40

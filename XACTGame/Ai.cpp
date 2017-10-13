@@ -8,6 +8,8 @@ enum AI_STATE aiState;
 
 ///*****************************************************
 /// PART OF AI
+///HOW TO CALL IT IN A LUA SCRIPT ?
+
 //--------------------------------------------------------------------------------------
 
 float GetDistFromWall( D3DXVECTOR3 P1, D3DXVECTOR3 P2, D3DXVECTOR3 P3, D3DXVECTOR3 N )

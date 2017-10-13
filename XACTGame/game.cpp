@@ -34,6 +34,7 @@
 #define IDC_SPLASH              17
 // INPUT CONFIGURATION
 #define IDC_INPUT               18
+#define IDC_FORWARD             19
 
 
 
@@ -162,9 +163,11 @@ void InitApp()
     // Init Input panel
     g_Render.InputMenuDlg.Init( &g_Render.DialogResourceManager );
     g_Render.InputMenuDlg.SetCallback( OnGUIEvent ); iY = 60;
-    g_Render.InputMenuDlg.AddStatic( IDC_STATIC, InputOpt.Title, ( 250 - 125 )/ 2, iY += 24, 125, 22 );
-    g_Render.InputMenuDlg.AddButton( IDC_BACK, L"Back", ( 250 - 125 ) / 2, iY += 40, 125, 22 );
-    g_Render.InputMenuDlg.SetTexture(0,L"concrete.tga");
+    g_Render.InputMenuDlg.AddStatic( IDC_STATIC, L"FORWARD", ( 250 - 125 )/ 2, iY += 24, 125, 22 );
+    g_Render.InputMenuDlg.AddEditBox( IDC_FORWARD, L"", ( 250 - 125 )/ 2, iY += 24, 125, 44 );
+    
+	g_Render.InputMenuDlg.AddButton( IDC_BACK, L"Back", ( 250 - 125 ) / 2, iY += 40,25, 22 );
+    //g_Render.InputMenuDlg.SetTexture(0,L"concrete.tga");
 	//TEST LUA  : start lua binding
 	
     initLua();
@@ -468,7 +471,7 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 
     // Create mesh
     WCHAR wsz[MAX_PATH];
-    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"room\\droidroom.x" ) );
+    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"room\\droidroom2.x" ) );
     g_Render.meshCell.Create( pd3dDevice, wsz );
 
     V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"ammo.x" ) );
@@ -799,14 +802,24 @@ void DroidChooseNewTask( int A )
     }
 }
 
-
+/*CONTROL OF AI AND UPDATE HERE
+TODO : Code the c++ func to work with lua
+IDEA : Separate the logic and the maths , keep math c++ and set logic to lua
+SEE : AI_Utils.lua
+*/
+void LUA_HandleDroidAI( float fElapsedTime )
+{
+}
 void HandleDroidAI( float fElapsedTime )
 {
     for( int A = 0; A < MAX_DROID; A++ )
     {
+		//check activity
         if( !g_GameState.DroidQ[A].bActive )
             continue;
-
+        //check hitpoints
+		//IDEA to use directx's SkinWeights template to record hit zones !
+		//https://msdn.microsoft.com/en-us/library/windows/desktop/bb147388(v=vs.85).aspx
         if( g_GameState.DroidQ[A].nHitPoints > 0 )
         {
             if( g_GameState.DroidQ[A].fAlpha < 1.0f )
@@ -814,12 +827,10 @@ void HandleDroidAI( float fElapsedTime )
                 g_GameState.DroidQ[A].fAlpha += fElapsedTime;
                 g_GameState.DroidQ[A].fAlpha = min( g_GameState.DroidQ[A].fAlpha, 1.0f );
             }
-
+            //check AI state and generation action
             switch( g_GameState.DroidQ[A].aiState )
             {
-				//Exemple idea with lua 
-				// Make a func AI_Turning() in lua that will be called by the c++ version below
-                case AI_TURNING:
+				  case AI_TURNING:
                 {
                     g_GameState.DroidQ[A].fRotInterp += fElapsedTime;
                     if( g_GameState.DroidQ[A].fRotInterp > 1.0f )
@@ -888,8 +899,8 @@ void HandleDroidAI( float fElapsedTime )
                     break;
                 }
             }
-
-            // Nudge droid and keep within bounds
+            //FUTURRE FUNCTION AI_MOOVE(int droidIndex) ...
+            // Moove droid and keep within bounds
             g_GameState.DroidQ[A].vPosition += g_GameState.DroidQ[A].vNudgeVelocity * fElapsedTime;
             if( g_GameState.DroidQ[A].vPosition.z < g_MinBound.z + ( DROID_SIZE * 0.6f ) )
                 g_GameState.DroidQ[A].vPosition.z = g_MinBound.z + ( DROID_SIZE * 0.6f );
@@ -907,7 +918,7 @@ void HandleDroidAI( float fElapsedTime )
             // Apply drag to the nudge velocity
             g_GameState.DroidQ[A].vNudgeVelocity -= g_GameState.DroidQ[A].vNudgeVelocity * ( fElapsedTime * 20.0f );
         }
-        else
+        else //AI_EXPLODE(int aiIndex)
         {
             // Hitpoints are gone, so animate explosion
             g_GameState.DroidQ[A].fDeathAnimation += fElapsedTime * DROID_DEATH_SPEED;

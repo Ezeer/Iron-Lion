@@ -32,6 +32,13 @@ void initLua()
 	InitTextHelper(txtHelper,cl);
 
 }
+
+void Lua_loadInputConfig()
+{
+	LuaRef t = getGlobal(Lua,"input.lua");
+	//TITLE
+    LuaRef forward = t["forward"];
+}
 void Lua_loadGuiMenu(int type)
 {
 	char* Name=NULL;

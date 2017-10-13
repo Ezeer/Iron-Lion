@@ -19,6 +19,11 @@ Parts of the future GameEngine :
 * AI LOGICS     : Using FSM techniques and more...
 * SCRIPTING     : USING LUA ( https://github.com/vinniefalco/LuaBridge , https://eliasdaler.wordpress.com/2014/07/18/using-lua-with-cpp-luabridge/ )
 
+TODO : 
+_USE XNA collision lib instead of actual simpliest code for walls ...
+_Use SkinMesh template in directx file to describe vertex groups for precise collision check
+
+
 FAQ
 ************************
 
