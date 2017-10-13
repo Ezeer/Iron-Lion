@@ -79,6 +79,9 @@ struct RENDER_STATE
     IDirect3DTexture9* pDefaultNormalMap; // Default normal map texture for un-normal maped geometry
     IDirect3DTexture9* pSplashScreen;
 	ID3DXSprite*	   pSplashSprite;	
+	//cockpit 2d for spacesim
+	IDirect3DTexture9* Cockpit2DTex;
+	ID3DXSprite*	   Cockpit2DTexSprite;	
 
     IDirect3DTexture9* pDroidNormalMap;
 

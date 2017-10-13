@@ -76,26 +76,55 @@ void ToggleMenu();
 void UpdateAspectRatioList( DXUTDeviceSettings* pDS );
 void UpdateResolutionList( DXUTDeviceSettings* pDS );
 //new
-void loadTexture(const wchar_t* fileName);
+//void loadTexture(const wchar_t* fileName,IDirect3DTexture9** tex,ID3DXSprite** Sprite);
 //...
-void loadTexture(const wchar_t* fileName)
+void loadSplash(const wchar_t* fileName,IDirect3DTexture9** tex,ID3DXSprite** Sprite)
 {
 	HRESULT hr;
 	
 	IDirect3DTexture9* SplScreen=0;
 	IDirect3DDevice9* pd3dDevice=DXUTGetD3D9Device();
    
-	if(!FAILED(D3DXCreateTextureFromFile(pd3dDevice, fileName, &g_Render.pSplashScreen)))
+	if(!FAILED(D3DXCreateTextureFromFile(pd3dDevice, fileName, tex)))
 	{
-			if(FAILED(D3DXCreateSprite(pd3dDevice,&g_Render.pSplashSprite)))
+			if(FAILED(D3DXCreateSprite(pd3dDevice,Sprite)))
 				MessageBox(0,L"loadTexture",L"FAILED",MB_OK);
-    
-
-	}
-	
-
+    }
 }
-
+void loadCockpit(const wchar_t* fileName)
+{
+	HRESULT hr;
+	IDirect3DDevice9* pd3dDevice=DXUTGetD3D9Device();
+   
+	if(!FAILED(D3DXCreateTextureFromFile(pd3dDevice, fileName,&g_Render.Cockpit2DTex)))
+	{
+			if(FAILED(D3DXCreateSprite(pd3dDevice,&g_Render.Cockpit2DTexSprite)))
+				MessageBox(0,L"loadTexture",L"FAILED",MB_OK);
+    }
+}
+void RenderCockpit()
+{
+	if(!g_Render.Cockpit2DTexSprite)return;
+	g_Render.Cockpit2DTexSprite->Begin(D3DXSPRITE_ALPHABLEND);
+		{
+			const D3DSURFACE_DESC* desc=DXUTGetD3D9BackBufferSurfaceDesc();
+            int width=desc->Width;
+			int height=desc->Height;
+			//to center we need to know :
+			//_ the size of the sprite
+			D3DXIMAGE_INFO inf;
+			D3DXGetImageInfoFromFile(L"cockpits\\cockpitLight.png",&inf);
+			int left=0;
+		    int top=0;
+			D3DXMATRIXA16 mat;
+			
+            D3DXMatrixScaling(  &mat, 1, 1.5, 1 );
+			D3DXVECTOR3 v=D3DXVECTOR3(left,top,0);
+            g_Render.Cockpit2DTexSprite->SetTransform(&mat);
+			g_Render.Cockpit2DTexSprite->Draw(g_Render.Cockpit2DTex,NULL,NULL,&v,0xFFFFFFFF);
+		}
+		g_Render.Cockpit2DTexSprite->End();
+}
 void Splash()
 {
 	if(!g_Render.pSplashSprite)return;
@@ -130,6 +159,9 @@ void InitApp()
     g_Render.pDefaultTex = NULL;
     g_Render.pSplashScreen = NULL;
     g_Render.pSplashSprite= NULL;
+	//cockpit
+	g_Render.Cockpit2DTex= NULL;
+	g_Render.Cockpit2DTexSprite= NULL;	
     g_Render.UseFixedFunction = 0.0f;
     g_Render.ForceShader = 0;
     g_Render.MaximumResolution = 4096.0f;
@@ -456,7 +488,9 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
     V_RETURN( g_Render.DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
 
 	//Create the splash screen 
-	loadTexture(L"splash.png");
+	loadSplash(L"splash.png",&g_Render.pSplashScreen,&g_Render.pSplashSprite);
+	//create the cockpit2d
+	loadCockpit(L"media\\cockpits\\cockpit4.png");
     // Initialize the font
     V_RETURN( D3DXCreateFont( pd3dDevice, 15, 0, FW_BOLD, 1, FALSE, DEFAULT_CHARSET,
                               OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
@@ -1666,7 +1700,10 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         {
             case GAME_RUNNING:
 				//RenderText();
-            Lua_RenderText(g_Render.pFont,g_Render.pTextSprite,D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) ); break;
+				{   RenderCockpit();
+					//Lua_RenderText(g_Render.pFont,g_Render.pTextSprite,D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) ); 
+				break;
+				}
             case GAME_MAIN_MENU:
                 V( g_Render.MainMenuDlg.OnRender( fElapsedTime ) ); break;
             case GAME_AUDIO_MENU:
@@ -2121,6 +2158,8 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
     SAFE_RELEASE( g_Render.pDefaultTex );
 	SAFE_RELEASE( g_Render.pSplashScreen );//new
 	SAFE_RELEASE( g_Render.pSplashSprite );//new
+	SAFE_RELEASE( g_Render.Cockpit2DTex );//new
+	SAFE_RELEASE( g_Render.Cockpit2DTexSprite );//new
 	SAFE_RELEASE( g_Render.pDefaultNormalMap );
     SAFE_RELEASE( g_Render.pDroidNormalMap );
     g_Render.meshCell.Destroy();
