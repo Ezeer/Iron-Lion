@@ -139,7 +139,7 @@
 				AdditionalOptions=""
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="Lua\LuaBridge;Lua\include;DXUT\Core;DXUT\Optional"
+				AdditionalIncludeDirectories="physics;Lua\LuaBridge;Lua\include;DXUT\Core;DXUT\Optional"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
@@ -753,6 +753,18 @@
 			</File>
 			<File
 				RelativePath=".\Ai.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Physics"
+			>
+			<File
+				RelativePath=".\Physics\xnaCollision.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Physics\xnaCollision.h"
 				>
 			</File>
 		</Filter>

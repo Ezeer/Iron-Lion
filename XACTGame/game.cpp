@@ -48,6 +48,7 @@ CFirstPersonCamera  g_Camera;
 extern RENDER_STATE g_Render;
 GAME_STATE  g_GameState;
 
+
 //--------------------------------------------------------------------------------------
 // Forward declarations 
 //--------------------------------------------------------------------------------------
@@ -477,10 +478,11 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
     V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"ammo.x" ) );
     g_Render.meshAmmo.Create( pd3dDevice, wsz );
 
+	//SETup AI here with gameMode.DroidQ[i] ? 
     V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"droid\\evildrone.x" ) );
     g_Render.meshDroid.Create( pd3dDevice, wsz );
-
-    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"droid\\evildrone-low.x" ) );
+    //collision debug
+    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"Physics\\boundingbox.x.x" ) );
     g_Render.meshDroidLow.Create( pd3dDevice, wsz );
 
     // Create a new vertex declaration to hold all the required data
@@ -852,17 +854,20 @@ void HandleDroidAI( float fElapsedTime )
                 {
                     if( g_GameState.bDroidMove )
                         g_GameState.DroidQ[A].vPosition += g_GameState.DroidQ[A].vVelocity * fElapsedTime;
-
+                    //COLLISION CHECK !
+					//WILL USE COLLISION from DXUT sample now ?
                     // Check bounce on front and back walls
                     if( g_GameState.DroidQ[A].vPosition.z < g_MinBound.z + ( DROID_SIZE * 0.6f ) )
                     {
                         g_GameState.DroidQ[A].vPosition.z = g_MinBound.z + ( DROID_SIZE * 0.6f );
                         DroidPickNewDirection( A );
                     }
+					//collision detected
                     if( g_GameState.DroidQ[A].vPosition.z > g_MaxBound.z - ( DROID_SIZE * 0.6f ) )
                     {
                         g_GameState.DroidQ[A].vPosition.z = g_MaxBound.z - ( DROID_SIZE * 0.6f );
-                        DroidPickNewDirection( A );
+                        //new direction
+						DroidPickNewDirection( A );
                     }
 
                     // Check bounce on left and right walls
@@ -2101,6 +2106,9 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
     g_Render.meshDroidExplosion.Destroy();
     g_Render.meshDroidLow.Destroy();
     g_Render.meshDroidExplosionLow.Destroy();
+    int i;
+	for(i=0;i<MAX_DROID;i++)
+	{ g_GameState.DroidQ[i].
     SAFE_RELEASE( g_Render.pMeshDroidExplosion );
 }
 
