@@ -815,9 +815,9 @@ void FireAmmo()
     D3DXMatrixInverse( &mInvView, NULL, g_Camera.GetViewMatrix() );
 
     // Compute initial velocity in world space from camera space
-    D3DXVECTOR4 InitialVelocity( 0.0f, 0.0f, 6.0f, 0.0f );
+    D3DXVECTOR4 InitialVelocity( 0.0f, 1.0f, 16.0f, 0.0f );
     D3DXVec4Transform( &InitialVelocity, &InitialVelocity, &mInvView );
-    D3DXVECTOR4 InitialPosition( 0.0f, -0.15f, 0.0f, 1.0f );
+    D3DXVECTOR4 InitialPosition( 0.0f, 0.0f, 1.0f, 1.0f );
     D3DXVec4Transform( &InitialPosition, &InitialPosition, &mInvView );
 
     PlayAudioCue( g_audioState.iAmmoFire );
