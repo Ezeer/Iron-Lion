@@ -11,6 +11,7 @@
 #include "resource.h"
 #include "script.h"
 #include "Ai.h"
+#include "log/log.h"
 //--------------------------------------------------------------------------------------
 // UI control IDs
 //--------------------------------------------------------------------------------------
@@ -47,6 +48,18 @@
 CFirstPersonCamera  g_Camera;
 extern RENDER_STATE g_Render;
 GAME_STATE  g_GameState;
+
+FILE* logfile=NULL;
+
+void setupLog(const char* filename)
+{
+	logfile = fopen(filename, "a");
+       Output2FILE::Stream() = logfile;
+        FILELog::ReportingLevel() = logINFO;
+	      FILE_LOG(logDEBUG) << "Iron-Lionstarted !";
+}
+
+void closeLog(){if(logfile)fclose(logfile);}
 
 
 //--------------------------------------------------------------------------------------
@@ -227,6 +240,7 @@ void InitApp()
     dm.Width = 1067; dm.Height = 600; g_Render.aWindowedDMList.Add( dm ); // 16:9
     dm.Width = 1280; dm.Height = 720; g_Render.aWindowedDMList.Add( dm ); // 16:9
     dm.Width = 1920; dm.Height = 1080; g_Render.aWindowedDMList.Add( dm ); // 16:9
+setupLog("log.txt");
 }
 
 
@@ -481,10 +495,11 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	//SETup AI here with gameMode.DroidQ[i] ? 
     V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"droid\\evildrone.x" ) );
     g_Render.meshDroid.Create( pd3dDevice, wsz );
-    //collision debug
-    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"Physics\\boundingbox.x.x" ) );
+    /*collision debug
+    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"boundingbox.x" ) );
+     g_Render.meshDroidCollision.Create( pd3dDevice, wsz );*/
+    V_RETURN( DXUTFindDXSDKMediaFileCch( wsz, MAX_PATH, L"droid\\evildrone-low.x" ) );
     g_Render.meshDroidLow.Create( pd3dDevice, wsz );
-
     // Create a new vertex declaration to hold all the required data
     const D3DVERTEXELEMENT9 VertexDecl[] =
     {
@@ -2106,11 +2121,11 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
     g_Render.meshDroidExplosion.Destroy();
     g_Render.meshDroidLow.Destroy();
     g_Render.meshDroidExplosionLow.Destroy();
-    int i;
-	for(i=0;i<MAX_DROID;i++)
-	{ 
-	g_GameState.DroidQ[i].meshDroidCollision.Destroy();
+    g_Render.meshDroidCollision.Destroy();
+	
     SAFE_RELEASE( g_Render.pMeshDroidExplosion );
+	closeLog();
+	
 }
 
 

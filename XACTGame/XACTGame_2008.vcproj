@@ -849,6 +849,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\log\log.h"
+			>
+		</File>
+		<File
 			RelativePath="main.cpp"
 			>
 		</File>

@@ -85,10 +85,10 @@ struct RENDER_STATE
     CDXUTXFileMesh meshCell;          // Cell mesh object
     CDXUTXFileMesh meshAmmo;          // Ammo mesh object
     CDXUTXFileMesh meshDroid;
-	
-    CDXUTXFileMesh meshDroidLow;
+	CDXUTXFileMesh meshDroidLow;
     CDXUTXFileMesh meshDroidExplosion;
     CDXUTXFileMesh meshDroidExplosionLow;
+	CDXUTXFileMesh meshDroidCollision;// to debug collision...
     ID3DXMesh* pMeshDroidExplosion;
 
     D3DXHANDLE hShaderTech;          // Technique to use when using programmable rendering path

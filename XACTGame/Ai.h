@@ -1,6 +1,7 @@
 #include "DXUT.h"
 #include "SDKmisc.h"
 #include "xnaCollision.h"
+#include "SDKmesh.h"
 
 //PHYSICS
 #define GROUND_Y 3.0f // -GROUND_Y is the Y coordinate of the ground.
@@ -82,7 +83,7 @@ extern enum AI_STATE
     float fAlpha;
     D3DXCOLOR Specular;
 	XNA::Sphere collisionSphere;
-	CDXUTXFileMesh meshDroidCollision;// to debug collision...
+	
 };
 
 
@@ -117,7 +118,7 @@ enum GAME_MODE
     D3DXCOLOR BlendToColor;
     D3DXCOLOR BlendFromColor;
     //DROID_STATE     DroidQ[MAX_DROID]; deprecated
-    DROID_STATE2     DroidQ[MAX_DROID];//use of Collision mesh for debug and more
+    DROID_STATE     DroidQ[MAX_DROID];//use of Collision mesh for debug and more
     int nDroidCount;
     int nMaxDroids;
 
