@@ -91,39 +91,64 @@ void loadSplash(const wchar_t* fileName,IDirect3DTexture9** tex,ID3DXSprite** Sp
 				MessageBox(0,L"loadTexture",L"FAILED",MB_OK);
     }
 }
-void loadCockpit(const wchar_t* fileName)
-{
-	HRESULT hr;
+
+struct S_Cockpit{const wchar_t* fileName;int x; int y; float scaleX; float scaleY;};
+S_Cockpit Cockpit[MAXCOCKPITS];
+int numCockpits=0;
+int indexCockpit=0;
+
+S_Cockpit loadCockpit(const char* nameOf)
+{   
+	
+	if(numCockpits>=MAXCOCKPITS)return Cockpit[numCockpits];
+	LuaRef t = getGlobal(Lua,"Cockpits");
+	//TITLE
+    LuaRef obj = t[nameOf];
+	LuaRef name = obj["name"];
+    LuaRef scaleX = obj["scaleX"];
+	LuaRef scaleY = obj["scaleY"];
+    
+	std::string txt = name.cast<std::string>();
+	std::wstring pathname = std::wstring(txt.begin(),txt.end());
+	S_Cockpit Ckpit; 
+	Ckpit.fileName=pathname.c_str();
+	Ckpit.scaleX=scaleX.cast<float>();
+    Ckpit.scaleY=scaleY.cast<float>();
+
+    HRESULT hr;
 	IDirect3DDevice9* pd3dDevice=DXUTGetD3D9Device();
    
-	if(!FAILED(D3DXCreateTextureFromFile(pd3dDevice, fileName,&g_Render.Cockpit2DTex)))
+	if(!FAILED(D3DXCreateTextureFromFile(pd3dDevice, Ckpit.fileName,&g_Render.Cockpit2DTex[numCockpits])))
 	{
-			if(FAILED(D3DXCreateSprite(pd3dDevice,&g_Render.Cockpit2DTexSprite)))
+			if(FAILED(D3DXCreateSprite(pd3dDevice,&g_Render.Cockpit2DTexSprite[numCockpits])))
 				MessageBox(0,L"loadTexture",L"FAILED",MB_OK);
     }
+	numCockpits++;
+	return Ckpit;
 }
-void RenderCockpit()
+void RenderCockpit(int index)
 {
-	if(!g_Render.Cockpit2DTexSprite)return;
-	g_Render.Cockpit2DTexSprite->Begin(D3DXSPRITE_ALPHABLEND);
+	if(!g_Render.Cockpit2DTexSprite[index])return;
+	g_Render.Cockpit2DTexSprite[index]->Begin(D3DXSPRITE_ALPHABLEND);
 		{
+			/*
 			const D3DSURFACE_DESC* desc=DXUTGetD3D9BackBufferSurfaceDesc();
             int width=desc->Width;
 			int height=desc->Height;
 			//to center we need to know :
 			//_ the size of the sprite
 			D3DXIMAGE_INFO inf;
-			D3DXGetImageInfoFromFile(L"cockpits\\cockpitLight.png",&inf);
+			D3DXGetImageInfoFromFile(Cockpit[index].fileName,&inf);
+			*/
 			int left=0;
 		    int top=0;
 			D3DXMATRIXA16 mat;
-			
-            D3DXMatrixScaling(  &mat, 1, 1.5, 1 );
+			D3DXMatrixScaling( &mat, Cockpit[index].scaleX,Cockpit[index].scaleY,1 );
 			D3DXVECTOR3 v=D3DXVECTOR3(left,top,0);
-            g_Render.Cockpit2DTexSprite->SetTransform(&mat);
-			g_Render.Cockpit2DTexSprite->Draw(g_Render.Cockpit2DTex,NULL,NULL,&v,0xFFFFFFFF);
+            g_Render.Cockpit2DTexSprite[index]->SetTransform(&mat);
+			g_Render.Cockpit2DTexSprite[index]->Draw(g_Render.Cockpit2DTex[index],NULL,NULL,&v,0xFFFFFFFF);
 		}
-		g_Render.Cockpit2DTexSprite->End();
+		g_Render.Cockpit2DTexSprite[index]->End();
 }
 void Splash()
 {
@@ -160,8 +185,11 @@ void InitApp()
     g_Render.pSplashScreen = NULL;
     g_Render.pSplashSprite= NULL;
 	//cockpit
-	g_Render.Cockpit2DTex= NULL;
-	g_Render.Cockpit2DTexSprite= NULL;	
+	for(int i=0;i<MAXCOCKPITS;i++)
+	{
+	g_Render.Cockpit2DTex[i]=NULL;
+	g_Render.Cockpit2DTexSprite[i]=NULL ;
+	}
     g_Render.UseFixedFunction = 0.0f;
     g_Render.ForceShader = 0;
     g_Render.MaximumResolution = 4096.0f;
@@ -490,7 +518,9 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	//Create the splash screen 
 	loadSplash(L"splash.png",&g_Render.pSplashScreen,&g_Render.pSplashSprite);
 	//create the cockpit2d
-	loadCockpit(L"media\\cockpits\\cockpit4.png");
+	Cockpit[0]=loadCockpit("fighter");
+	Cockpit[1]=loadCockpit("fighter2");
+
     // Initialize the font
     V_RETURN( D3DXCreateFont( pd3dDevice, 15, 0, FW_BOLD, 1, FALSE, DEFAULT_CHARSET,
                               OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
@@ -1700,7 +1730,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         {
             case GAME_RUNNING:
 				//RenderText();
-				{   RenderCockpit();
+				{   RenderCockpit(0);
 					//Lua_RenderText(g_Render.pFont,g_Render.pTextSprite,D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) ); 
 				break;
 				}
@@ -2156,10 +2186,13 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
     SAFE_RELEASE( g_Render.pEffect );
     SAFE_RELEASE( g_Render.pFont );
     SAFE_RELEASE( g_Render.pDefaultTex );
-	SAFE_RELEASE( g_Render.pSplashScreen );//new
-	SAFE_RELEASE( g_Render.pSplashSprite );//new
-	SAFE_RELEASE( g_Render.Cockpit2DTex );//new
-	SAFE_RELEASE( g_Render.Cockpit2DTexSprite );//new
+	SAFE_RELEASE( g_Render.pSplashScreen );
+	SAFE_RELEASE( g_Render.pSplashSprite );
+	for(int i=0;i<MAXCOCKPITS;i++)
+	{
+	SAFE_RELEASE( g_Render.Cockpit2DTex[i] );
+	SAFE_RELEASE( g_Render.Cockpit2DTexSprite[i] );
+	}
 	SAFE_RELEASE( g_Render.pDefaultNormalMap );
     SAFE_RELEASE( g_Render.pDroidNormalMap );
     g_Render.meshCell.Destroy();

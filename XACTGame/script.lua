@@ -160,6 +160,22 @@ VideoMenuOption = {
 
 }
 
+Cockpits = {
+    fighter={
+	name = "media\\cockpits\\cockpit4.png",
+	x = 0.0 ,
+	y = 0.0 ,
+	scaleX = 1 ,
+	scaleY= 1.5 
+	},
+	fighter2={
+	name = "media\\cockpits\\cockpit7.png",
+	x = 0.0 ,
+	y = 0.0 ,
+	scaleX = 0.6 ,
+	scaleY= 0.4
+	}
+}
 output = function(a,b)
     printMessage("You can still call C++ functions from Lua functions!")
     return a + b

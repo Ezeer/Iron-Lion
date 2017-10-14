@@ -35,7 +35,7 @@
 #define CAMERA_SIZE 0.2f // CAMERA_SIZE is used for clipping camera movement
 
 // MinBound and MaxBound are the bounding box representing the cell mesh.
- const D3DXVECTOR3           g_MinBound( -6.0f, -GROUND_Y, -6.0f );
+const D3DXVECTOR3           g_MinBound( -6.0f, -GROUND_Y, -6.0f );
 const D3DXVECTOR3           g_MaxBound( 6.0f, GROUND_Y, 6.0f );
 
 extern enum AI_STATE

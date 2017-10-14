@@ -40,6 +40,7 @@
 #define MAX_SOUND_VELOCITY 1.0f // MAX_SOUND_VELOCITY is the velocity at which the bouncing sound is played at maximum volume.  Higher velocity uses maximum volume.
 #define MIN_SOUND_VELOCITY 0.07f  // MIN_SOUND_VELOCITY is the minimum contact velocity required to make a sound.
 #define MIN_VOL_ADJUST 0.8f  // MIN_VOL_ADJUST is the minimum volume adjustment based on contact velocity.
+#define MAXCOCKPITS 5
 /*
 // MinBound and MaxBound are the bounding box representing the cell mesh.
 const D3DXVECTOR3           g_MinBound( -6.0f, -GROUND_Y, -6.0f );
@@ -80,8 +81,8 @@ struct RENDER_STATE
     IDirect3DTexture9* pSplashScreen;
 	ID3DXSprite*	   pSplashSprite;	
 	//cockpit 2d for spacesim
-	IDirect3DTexture9* Cockpit2DTex;
-	ID3DXSprite*	   Cockpit2DTexSprite;	
+	IDirect3DTexture9* Cockpit2DTex[MAXCOCKPITS];
+	ID3DXSprite*	   Cockpit2DTexSprite[MAXCOCKPITS];	
 
     IDirect3DTexture9* pDroidNormalMap;
 
