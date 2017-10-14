@@ -49,6 +49,9 @@ CFirstPersonCamera  g_Camera;
 extern RENDER_STATE g_Render;
 GAME_STATE  g_GameState;
 
+enum GAMEMAP{space,cell};
+GAMEMAP gameMap=space;
+
 FILE* logfile=NULL;
 
 void setupLog(const char* filename)
@@ -1672,10 +1675,18 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         V( g_Render.pEffect->SetMatrix( g_Render.hMatWV, &mWorldView ) );
         V( g_Render.pEffect->SetMatrix( g_Render.hMatW, &g_Render.mCellWorld ) );
         g_Render.pEffect->SetBool( "g_bUseSpecular", false ); // !g_Render.DisableSpecular );
-
-        g_Render.meshCell.Render( g_Render.pEffect, g_Render.hDiffuseTexture, g_Render.hDiffuse, 0, g_Render.hSpecular,
-                                  0, g_Render.hPower, true, false );
-		 //g_Render.meshDroidCollision.Render(pd3dDevice);
+       
+		switch(gameMap)
+		{ case space://remove the cell
+		            {     break;
+					}
+		  case cell://remove the cell
+		            {  g_Render.meshCell.Render( g_Render.pEffect, g_Render.hDiffuseTexture, g_Render.hDiffuse, 0, g_Render.hSpecular,
+                                                 0, g_Render.hPower, true, false );
+		     break;
+					}
+		}
+       //g_Render.meshDroidCollision.Render(pd3dDevice);
 
 
         // Render opaque objects first
@@ -2133,7 +2144,7 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
                 g_GameState.bDroidMove = !g_GameState.bDroidMove;
                 break;
 
-            case 'M': // Droid auto-add 
+            case 'A': // Droid auto-add 
                 g_GameState.bAutoAddDroids = !g_GameState.bAutoAddDroids;
                 break;
 
@@ -2144,6 +2155,10 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 
             case 'B': // Mass droid kill
                 g_GameState.bMassDroidKill = true;
+                break;
+			case 'M': // change map
+				//gameMap?space:cell;
+				if(gameMap==space)gameMap=cell;else gameMap=space;
                 break;
         }
     }
